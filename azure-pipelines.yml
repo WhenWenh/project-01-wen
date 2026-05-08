@@ -7,6 +7,7 @@ pool:
 variables:
   - group: KeyVaultVariables
 
+# Define a job to build, test, and deploy the application
 jobs:
   - job: build_test_deploy
     displayName: "Build, test, and deploy"
