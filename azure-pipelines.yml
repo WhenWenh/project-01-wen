@@ -1,77 +1,79 @@
 trigger:
   - main
 
-timeoutInMinutes: 10
-
 pool:
   vmImage: ubuntu-latest
 
 variables:
   - group: KeyVaultVariables
 
-steps:
-  # Checkout
-  - checkout: self
-    persistCredentials: true
+jobs:
+  - job: build_test_deploy
+    displayName: "Build, test, and deploy"
+    timeoutInMinutes: 10
+    steps:
+      # Checkout
+      - checkout: self
+        persistCredentials: true
 
-  # Install JDK 25
-  - script: |
-      set -e
-      
-      curl -L -o jdk25.tar.gz https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse
-      tar -xzf jdk25.tar.gz
-      
-      JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-25*" | head -n 1)
-      
-      echo "##vso[task.setvariable variable=JAVA_HOME]$JDK_DIR"
-      echo "Installed JDK at $JDK_DIR"
-      
-      $JDK_DIR/bin/java -version
-    displayName: "Install JDK 25 (Temurin)"
+      # Install JDK 25
+      - script: |
+          set -e
+          
+          curl -L -o jdk25.tar.gz https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse
+          tar -xzf jdk25.tar.gz
+          
+          JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-25*" | head -n 1)
+          
+          echo "##vso[task.setvariable variable=JAVA_HOME]$JDK_DIR"
+          echo "Installed JDK at $JDK_DIR"
+          
+          $JDK_DIR/bin/java -version
+        displayName: "Install JDK 25 (Temurin)"
 
-  # Prepare Maven cache directory
-  - script: mkdir -p /home/vsts/.m2/repository
-    displayName: "Prepare Maven cache directory"
+      # Prepare Maven cache directory
+      - script: mkdir -p /home/vsts/.m2/repository
+        displayName: "Prepare Maven cache directory"
 
-  # Cache Maven dependencies
-  - task: Cache@2
-    inputs:
-      key: 'maven | "$(Agent.OS)" | **/pom.xml'
-      restoreKeys: |
-        maven | "$(Agent.OS)"
-      path: /home/vsts/.m2/repository
+      # Cache Maven dependencies
+      - task: Cache@2
+        inputs:
+          key: 'maven | "$(Agent.OS)" | **/pom.xml'
+          restoreKeys: |
+            maven | "$(Agent.OS)"
+          path: /home/vsts/.m2/repository
 
-  # Build
-  - script: mvn -B clean package -DskipTests
-    displayName: "Build (Maven)"
-    env:
-      JAVA_HOME: $(JAVA_HOME)
-      PATH: $(JAVA_HOME)/bin:$(PATH)
+      # Build
+      - script: mvn -B clean package -DskipTests
+        displayName: "Build (Maven)"
+        env:
+          JAVA_HOME: $(JAVA_HOME)
+          PATH: $(JAVA_HOME)/bin:$(PATH)
 
-  # Run
-  - script: java -cp target/project-02-1.0-SNAPSHOT.jar org.example.Main
-    displayName: "Run application"
-    env:
-      JAVA_HOME: $(JAVA_HOME)
-      PATH: $(JAVA_HOME)/bin:$(PATH)
-      DB_USER: $(db-user)
-      DB_PASSWORD: $(db-password)
-      JWT_SECRET: $(jwt-secret-base64)
+      # Run
+      - script: java -cp target/project-02-1.0-SNAPSHOT.jar org.example.Main
+        displayName: "Run application"
+        env:
+          JAVA_HOME: $(JAVA_HOME)
+          PATH: $(JAVA_HOME)/bin:$(PATH)
+          DB_USER: $(db-user)
+          DB_PASSWORD: $(db-password)
+          JWT_SECRET: $(jwt-secret-base64)
 
-  # Test
-  - script: mvn -B test
-    displayName: "Test (JUnit)"
-    env:
-      JAVA_HOME: $(JAVA_HOME)
-      PATH: $(JAVA_HOME)/bin:$(PATH)
+      # Test
+      - script: mvn -B test
+        displayName: "Test (JUnit)"
+        env:
+          JAVA_HOME: $(JAVA_HOME)
+          PATH: $(JAVA_HOME)/bin:$(PATH)
 
-  # Publish test results
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      testRunTitle: 'JUnit Tests'
-    condition: succeededOrFailed()
+      # Publish test results
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFiles: '**/surefire-reports/TEST-*.xml'
+          testRunTitle: 'JUnit Tests'
+        condition: succeededOrFailed()
 
-  # Deploy (placeholder)
-  - script: echo "Deploy step"
-    displayName: "Deploy"
+      # Deploy (placeholder)
+      - script: echo "Deploy step"
+        displayName: "Deploy"
