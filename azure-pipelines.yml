@@ -6,6 +6,8 @@ pool:
 
 variables:
   - group: KeyVaultVariables
+  - name: npm_config_cache
+    value: $(Pipeline.Workspace)/.npm
 
 
 stages:
@@ -101,7 +103,7 @@ stages:
               key: 'npm | "$(Agent.OS)" | frontend/package-lock.json'
               restoreKeys: |
                 npm | "$(Agent.OS)"
-              path: ~/.npm
+              path: $(npm_config_cache)
 
           - script: npm ci
             displayName: "Install frontend dependencies"
