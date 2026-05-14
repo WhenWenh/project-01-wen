@@ -37,6 +37,26 @@ stages:
             displayName: "Make Maven wrapper executable"
             workingDirectory: backend
 
+          - script: |
+              docker compose up -d postgres
+
+              for i in {1..30}; do
+                if docker exec tour-postgres pg_isready -U "$DB_USER" -d "$DB_NAME"; then
+                  exit 0
+                fi
+                sleep 2
+              done
+
+              docker compose logs postgres
+              exit 1
+            displayName: "Start PostgreSQL for backend tests"
+            workingDirectory: backend
+            env:
+              DB_USER: $(db-user)
+              DB_PASSWORD: $(db-password)
+              DB_NAME: $(db-name)
+              DB_PORT: $(db-port)
+
           - script: ./mvnw -B clean package
             displayName: "Build and test backend"
             workingDirectory: backend
@@ -53,6 +73,16 @@ stages:
               testResultsFiles: "backend/target/surefire-reports/TEST-*.xml"
               testRunTitle: "Backend JUnit Tests"
             condition: succeededOrFailed()
+
+          - script: docker compose down -v
+            displayName: "Stop PostgreSQL"
+            workingDirectory: backend
+            env:
+              DB_USER: $(db-user)
+              DB_PASSWORD: $(db-password)
+              DB_NAME: $(db-name)
+              DB_PORT: $(db-port)
+            condition: always()
 
   - stage: Release
     displayName: "Release"
