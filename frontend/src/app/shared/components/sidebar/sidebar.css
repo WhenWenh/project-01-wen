@@ -1,0 +1,133 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebar {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #d8dee9;
+  background: #ffffff;
+  padding: 1.5rem 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.sidebar__top {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sidebar__brand {
+  color: #111827;
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 2px;
+}
+
+.sidebar__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sidebar__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: #1f2937;
+  padding: 0.75rem 0.5rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar__logout:hover {
+  background: #ff9c56;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.sidebar__account {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #1f2937;
+  padding: 0.5rem;
+}
+
+:host ::ng-deep .sidebar-menu.p-menu {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+:host ::ng-deep .sidebar-menu .p-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+:host ::ng-deep .sidebar-menu .p-menu-item-content {
+  border-radius: 0.5rem;
+}
+
+:host ::ng-deep .sidebar-menu .p-menu-item-link {
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  color: #1f2937;
+  padding: 0.75rem 0.9rem;
+}
+
+.sidebar-menu__link {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  color: #1f2937;
+  padding: 0.75rem 0.9rem;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+
+.sidebar-menu__link:hover {
+  background: #ff9c56;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.sidebar-menu__link--active {
+  background: #f97316;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.sidebar-menu__link--active:hover {
+  background: #ff9c56;
+  color: #ffffff;
+}
+
+:host ::ng-deep .sidebar-menu .p-menu-item.p-focus > .p-menu-item-content,
+:host ::ng-deep .sidebar-menu .p-menu-item-link:focus {
+  background: #fff1e6;
+}
+
+:host ::ng-deep .sidebar-menu .p-menu-item-icon {
+  width: 1.25rem;
+  min-width: 1.25rem;
+  color: inherit;
+  text-align: center;
+}
+
+:host ::ng-deep .sidebar__account .p-avatar {
+  background: #eff6ff;
+  color: #2563eb;
+}

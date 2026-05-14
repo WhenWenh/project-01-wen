@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .page-breadcrumb.p-breadcrumb {
+  margin-top: 1rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+:host ::ng-deep .page-breadcrumb .p-breadcrumb-list {
+  gap: 0.45rem;
+}
+
+:host ::ng-deep .page-breadcrumb .p-menuitem-link,
+:host ::ng-deep .page-breadcrumb .p-breadcrumb-item-link {
+  color: #ff8a33;
+  font-size: 0.98rem;
+  text-decoration: none;
+}
+
+:host ::ng-deep .page-breadcrumb .p-menuitem-link:hover,
+:host ::ng-deep .page-breadcrumb .p-breadcrumb-item-link:hover,
+:host ::ng-deep .page-breadcrumb .p-menuitem-link:hover span,
+:host ::ng-deep .page-breadcrumb .p-breadcrumb-item-link:hover span {
+  color: #111827;
+}
+
+:host ::ng-deep .page-breadcrumb .p-breadcrumb-separator {
+  color: #6b7280;
+  font-size: 0.95rem;
+}

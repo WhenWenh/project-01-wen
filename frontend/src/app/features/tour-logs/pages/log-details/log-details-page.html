@@ -1,0 +1,113 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="log-details-content">
+    <div class="log-details-shell">
+      <header class="log-details-header">
+        <div>
+          <div class="log-details-title-row">
+            <button
+              type="button"
+              class="log-details-back-icon"
+              aria-label="Back to tour logs"
+              (click)="goBack()"
+            >
+              <span class="pi pi-arrow-left" aria-hidden="true"></span>
+            </button>
+            <h1>Log Details</h1>
+          </div>
+          <p class="log-details-description">
+            Detailed view of a single tour log entry.
+          </p>
+          <app-page-breadcrumb [items]="breadcrumbItems()" />
+        </div>
+
+        @if (log()) {
+          <div class="log-details-actions">
+            <p-button
+              label="Edit"
+              styleClass="log-details-edit-button"
+              (onClick)="openEditLog()"
+            />
+            <p-button
+              label="Delete"
+              styleClass="log-details-delete-button"
+              [loading]="isDeletingLog()"
+              [disabled]="isDeletingLog()"
+              (onClick)="openDeleteDialog()"
+            />
+          </div>
+        }
+      </header>
+
+      @if (isLoadingLog()) {
+        <section class="log-details-card log-details-empty-state">
+          <strong>Loading log...</strong>
+          <p>The tour log details are being fetched.</p>
+        </section>
+      } @else if (loadError()) {
+        <section class="log-details-card log-details-empty-state">
+          <strong>Could not load log.</strong>
+          <p>{{ loadError() }}</p>
+        </section>
+      } @else if (log(); as selectedLog) {
+        <section class="log-details-card">
+          <div class="log-details-card__intro">
+            <h2>Log Overview</h2>
+            <p>Key metrics and notes from this tour log.</p>
+          </div>
+
+          <div class="log-details-grid">
+            <div class="log-details-item">
+              <span>Log ID</span>
+              <strong>{{ selectedLog.id }}</strong>
+            </div>
+
+            <div class="log-details-item">
+              <span>Tour ID</span>
+              <strong>{{ selectedLog.tourId }}</strong>
+            </div>
+
+            <div class="log-details-item">
+              <span>Date</span>
+              <strong>{{ formatLogDate(selectedLog.dateTime) }}</strong>
+            </div>
+
+            <div class="log-details-item">
+              <span>Rating</span>
+              <strong>{{ selectedLog.rating }}</strong>
+            </div>
+
+            <div class="log-details-item">
+              <span>Difficulty</span>
+              <strong>{{ selectedLog.difficulty }}</strong>
+            </div>
+
+            <div class="log-details-item">
+              <span>Distance</span>
+              <strong>{{ formatDistance(selectedLog.totalDistance) }}</strong>
+            </div>
+
+            <div class="log-details-item">
+              <span>Total Time</span>
+              <strong>{{ formatDuration(selectedLog.totalTime) }}</strong>
+            </div>
+
+            <div class="log-details-item log-details-item--wide">
+              <span>Comment</span>
+              <strong>{{ selectedLog.comment }}</strong>
+            </div>
+          </div>
+        </section>
+      }
+    </div>
+  </section>
+</app-shell>
+
+<app-confirm-dialog
+  [visible]="showDeleteDialog()"
+  title="Delete tour log"
+  [message]="'Do you really want to delete log ' + (log()?.id || '') + '? This action cannot be undone.'"
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  (confirm)="confirmDeleteLog()"
+  (cancel)="closeDeleteDialog()"
+/>

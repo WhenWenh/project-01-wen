@@ -1,0 +1,12 @@
+<section class="app-shell">
+  <app-sidebar
+    class="app-shell__sidebar"
+    [title]="title"
+    [footerLabel]="footerLabel"
+    (logoutClick)="logoutClick.emit()"
+  />
+
+  <section class="app-shell__content">
+    <ng-content />
+  </section>
+</section>

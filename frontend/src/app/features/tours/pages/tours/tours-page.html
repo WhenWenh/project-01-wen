@@ -1,0 +1,139 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="tours-content">
+    <div class="tours-shell">
+      <header class="tours-header">
+        <div>
+          <h1>My Tours</h1>
+          <p class="tours-description">Manage, edit and analyze your created tours.</p>
+        </div>
+
+        <p-button
+          label="+ New Tour"
+          styleClass="tours-new-tour-button"
+          (onClick)="openNewTour()"
+        />
+      </header>
+
+      <section class="tours-filter-bar">
+        <p-iconfield class="tours-search">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            placeholder="Search tours..."
+            [formControl]="searchControl"
+          />
+        </p-iconfield>
+
+        <label class="tours-filter-select">
+          <span class="tours-filter-select__wrap">
+            <select [formControl]="filterControl">
+              <option value="all">All</option>
+              <option value="favorites">Favorite</option>
+              <option value="not-favorites">Not Favorite</option>
+            </select>
+          </span>
+        </label>
+      </section>
+
+      @if (isLoadingTours()) {
+        <section class="tours-empty-state">
+          <h2>Loading tours...</h2>
+        </section>
+      } @else if (toursLoadError()) {
+        <section class="tours-empty-state">
+          <h2>Could not load tours</h2>
+          <p>{{ toursLoadError() }}</p>
+        </section>
+      } @else if (filteredTours().length > 0) {
+        <section class="tours-list">
+          @for (tour of visibleTours(); track trackTour($index, tour)) {
+            <article class="tour-card">
+              <div class="tour-card__content">
+                <div class="tour-card__details">
+                  <div class="tour-card__intro">
+                    <h2>{{ tour.name }}</h2>
+                    <app-favorite-toggle
+                      [active]="tour.isFavorite"
+                      [loading]="isFavoriteBusy(tour.id)"
+                      (toggle)="toggleFavorite(tour)"
+                    />
+                  </div>
+
+                  <div class="tour-card__meta-grid tour-card__meta-grid--compact">
+                    <div class="tour-card__meta-item">
+                      <span>Tour ID</span>
+                      <strong>{{ tour.id }}</strong>
+                    </div>
+
+                    @if (tour.tourType) {
+                      <div class="tour-card__meta-item">
+                        <span>Tour Type</span>
+                        <strong>{{ tourTypeLabel(tour.tourType) }}</strong>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="tour-card__actions">
+                    <p-button
+                      label="View"
+                      icon="pi pi-eye"
+                      styleClass="tour-card__action tour-card__action--view"
+                      (onClick)="openTourDetails(tour.id)"
+                    />
+
+                    <p-button
+                      label="Edit"
+                      icon="pi pi-pencil"
+                      styleClass="tour-card__action tour-card__action--edit"
+                      (onClick)="openEditTour(tour.id)"
+                    />
+
+                    <p-button
+                      label="Delete"
+                      icon="pi pi-trash"
+                      styleClass="tour-card__action tour-card__action--delete"
+                      [loading]="isDeletingTour() && selectedTourForDelete()?.id === tour.id"
+                      [disabled]="isDeletingTour()"
+                      (onClick)="openDeleteDialog(tour)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </article>
+          }
+        </section>
+
+        <app-pagination
+          [first]="first()"
+          [rows]="rows"
+          [totalRecords]="filteredTours().length"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          (pageChange)="onPageChange($event)"
+        />
+      } @else {
+        <section class="tours-empty-state">
+          <h2>No tours found</h2>
+          <p>
+            Create your first tour or adjust the search
+            @if (currentFilterLabel()) {
+              to find an existing {{ currentFilterLabel() }} tour.
+            } @else {
+              to find an existing one.
+            }
+          </p>
+        </section>
+      }
+    </div>
+  </section>
+
+  <app-confirm-dialog
+    [visible]="showDeleteDialog()"
+    title="Delete tour"
+    [message]="'Do you really want to delete ' + (selectedTourForDelete()?.name || 'this tour') + '? This action cannot be undone.'"
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    (confirm)="confirmDeleteTour()"
+    (cancel)="closeDeleteDialog()"
+  />
+</app-shell>

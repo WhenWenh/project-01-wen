@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  margin-top: 1rem;
+}
+
+:host ::ng-deep .app-pagination.p-paginator {
+  border: 0;
+  background: transparent;
+  padding-inline: 0;
+}
+
+:host ::ng-deep .app-pagination .p-paginator-page,
+:host ::ng-deep .app-pagination .p-paginator-next,
+:host ::ng-deep .app-pagination .p-paginator-prev,
+:host ::ng-deep .app-pagination .p-paginator-first,
+:host ::ng-deep .app-pagination .p-paginator-last {
+  color: #111827;
+}
+
+:host ::ng-deep .app-pagination .p-paginator-page:hover,
+:host ::ng-deep .app-pagination .p-paginator-next:hover,
+:host ::ng-deep .app-pagination .p-paginator-prev:hover,
+:host ::ng-deep .app-pagination .p-paginator-first:hover,
+:host ::ng-deep .app-pagination .p-paginator-last:hover {
+  background: #111827;
+  color: #ffffff;
+}
+
+:host ::ng-deep .app-pagination .p-paginator-page.p-paginator-page-selected {
+  background: #ff8a33;
+  border: 2px solid #ff8a33;
+  color: #ffffff;
+}
+
+:host ::ng-deep .app-pagination .p-paginator-current {
+  color: #111827;
+}
+
+:host ::ng-deep .app-pagination .p-paginator-page:focus-visible,
+:host ::ng-deep .app-pagination .p-paginator-next:focus-visible,
+:host ::ng-deep .app-pagination .p-paginator-prev:focus-visible,
+:host ::ng-deep .app-pagination .p-paginator-first:focus-visible,
+:host ::ng-deep .app-pagination .p-paginator-last:focus-visible {
+  outline: 2px solid rgba(255, 138, 51, 0.35);
+  outline-offset: 0;
+  box-shadow: none;
+}
+
+:host ::ng-deep .app-pagination .p-paginator-page:not(.p-paginator-page-selected):hover {
+  border-radius: 999px;
+}

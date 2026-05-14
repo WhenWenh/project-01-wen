@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  background: #ffffff;
+  color: #1f2937;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.export-content {
+  padding: 2rem;
+}
+
+.export-shell {
+  width: 100%;
+  max-width: 1200px;
+  padding-left: 2rem;
+  border-radius: 1rem;
+}
+
+.export-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: #1f2937;
+}
+
+@media (max-width: 900px) {
+  .export-content {
+    padding: 1.25rem;
+  }
+
+  .export-shell {
+    padding-left: 0;
+  }
+
+  .export-header {
+    flex-direction: column;
+  }
+}

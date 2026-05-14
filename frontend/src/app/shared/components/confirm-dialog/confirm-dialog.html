@@ -1,0 +1,32 @@
+@if (visible) {
+  <div class="confirm-dialog-backdrop" (click)="cancel.emit()">
+    <section
+      class="confirm-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="confirm-dialog-title">{{ title }}</h2>
+      <p>{{ message }}</p>
+
+      <div class="confirm-dialog__actions">
+        <button
+          type="button"
+          class="confirm-dialog__button confirm-dialog__button--secondary"
+          (click)="cancel.emit()"
+        >
+          {{ cancelLabel }}
+        </button>
+
+        <button
+          type="button"
+          class="confirm-dialog__button confirm-dialog__button--primary"
+          (click)="confirm.emit()"
+        >
+          {{ confirmLabel }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

@@ -1,0 +1,144 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="create-tour-content">
+    <div class="create-tour-page">
+      <header class="create-tour-header">
+        <div>
+          <h1>Create New Tour</h1>
+
+          <div class="create-tour-progress" aria-label="Create tour progress">
+            <h2 class="create-tour-progress__step create-tour-progress__step--active">
+              Details
+            </h2>
+            <h2 class="create-tour-progress__step">Summary</h2>
+            <h2 class="create-tour-progress__step">Done</h2>
+          </div>
+        </div>
+      </header>
+
+      <section class="create-tour-card">
+        <h3>Tour Details</h3>
+        <h4 class="create-tour-card__subtitle">Provide the basic details of your tour</h4>
+
+        <form [formGroup]="detailsForm" class="create-tour-form">
+          <div class="create-tour-form__row create-tour-form__row--wide">
+            <label
+              class="create-tour-field"
+              [class.create-tour-field--invalid]="showRequiredError('name')"
+            >
+              <span>Tour Name</span>
+              <input
+                type="text"
+                formControlName="name"
+                [class.create-tour-field__control--invalid]="showRequiredError('name')"
+              />
+              @if (showRequiredError('name')) {
+                <small class="create-tour-field__error">Tour name is required.</small>
+              }
+            </label>
+
+            <label
+              class="create-tour-field create-tour-field--compact create-tour-field--select"
+              [class.create-tour-field--invalid]="showRequiredError('tourType')"
+            >
+              <span>Tour Type</span>
+              <span class="create-tour-field__select-wrap">
+                <select
+                  formControlName="tourType"
+                  [class.create-tour-field__control--invalid]="showRequiredError('tourType')"
+                >
+                  <option value=""></option>
+                  <option value="BIKE">{{ tourTypeLabel('BIKE') }}</option>
+                  <option value="HIKE">{{ tourTypeLabel('HIKE') }}</option>
+                  <option value="RUNNING">{{ tourTypeLabel('RUNNING') }}</option>
+                  <option value="VACATION">{{ tourTypeLabel('VACATION') }}</option>
+                </select>
+              </span>
+              @if (showRequiredError('tourType')) {
+                <small class="create-tour-field__error">Tour type is required.</small>
+              }
+            </label>
+          </div>
+
+          <div class="create-tour-form__row">
+            <label
+              class="create-tour-field"
+              [class.create-tour-field--invalid]="showRequiredError('from')"
+            >
+              <span>From</span>
+              <input
+                type="text"
+                formControlName="from"
+                [class.create-tour-field__control--invalid]="showRequiredError('from')"
+              />
+              @if (showRequiredError('from')) {
+                <small class="create-tour-field__error">Start location is required.</small>
+              }
+            </label>
+
+            <label
+              class="create-tour-field"
+              [class.create-tour-field--invalid]="showRequiredError('to')"
+            >
+              <span>To</span>
+              <input
+                type="text"
+                formControlName="to"
+                [class.create-tour-field__control--invalid]="showRequiredError('to')"
+              />
+              @if (showRequiredError('to')) {
+                <small class="create-tour-field__error">Destination is required.</small>
+              }
+            </label>
+          </div>
+
+          <label
+            class="create-tour-field create-tour-field--textarea"
+            [class.create-tour-field--invalid]="showRequiredError('description')"
+          >
+            <span>Description</span>
+            <textarea
+              [class.create-tour-field__control--invalid]="
+                isDescriptionTooLong || showRequiredError('description')
+              "
+              formControlName="description"
+            ></textarea>
+            @if (showRequiredError('description')) {
+              <small class="create-tour-field__error">Description is required.</small>
+            }
+            <small [class.create-tour-field__counter--invalid]="isDescriptionTooLong">
+              {{ descriptionLength }}/{{ maxDescriptionLength }}
+            </small>
+          </label>
+        </form>
+
+        <div class="create-tour-actions">
+          <button
+            type="button"
+            class="create-tour-actions__button create-tour-actions__button--secondary"
+            (click)="cancelCreation()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="create-tour-actions__button create-tour-actions__button--primary"
+            (click)="goToSummary()"
+          >
+            Go to summary
+          </button>
+        </div>
+      </section>
+    </div>
+  </section>
+</app-shell>
+
+<app-confirm-dialog
+  [visible]="showLeaveDialog"
+  title="Cancel tour creation?"
+  message="Do you really want to cancel creating this tour? Your current progress will be lost."
+  confirmLabel="Leave page"
+  cancelLabel="Stay here"
+  (confirm)="confirmLeave()"
+  (cancel)="stayOnPage()"
+/>

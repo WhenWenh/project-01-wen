@@ -1,0 +1,131 @@
+<section class="signin-shell">
+  <div class="visual-side" aria-hidden="true">
+    <div class="visual-side__brand">[Placeholder]</div>
+    <div class="visual-side__copy">
+      <p>Vienna.</p>
+      <p>Dive deep</p>
+      <p>Into a new Journey.</p>
+    </div>
+  </div>
+
+  <p-card class="form-panel">
+    <div class="signin-card__topbar" aria-hidden="true">
+      
+    </div>
+
+    <div class="signin-card__hero">
+      <p class="signin-card__eyebrow">Welcome!</p>
+      <h1>Create an account with your credentials</h1>
+      <p class="signin-card__subtitle">
+        Set up your profile to continue using our services.
+      </p>
+    </div>
+
+    <form [formGroup]="signinForm" class="signin-form" (ngSubmit)="onSubmit()">
+      <div class="field-group" [class.field-group--label-invalid]="showRequiredError('email')">
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            class="w-full"
+          />
+          <label for="email">Email</label>
+        </p-floatlabel>
+        @if (showRequiredError('email')) {
+          <p class="field-error">Email is required.</p>
+        }
+        @if (showEmailError()) {
+          <p class="field-error">Please enter a valid email address.</p>
+        }
+      </div>
+
+      <div class="field-group" [class.field-group--label-invalid]="showRequiredError('username')">
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="username"
+            type="text"
+            formControlName="username"
+            class="w-full"
+          />
+          <label for="username">Username</label>
+        </p-floatlabel>
+        @if (showRequiredError('username')) {
+          <p class="field-error">Username is required.</p>
+        }
+        @if (showMinLengthError('username')) {
+          <p class="field-error">Username must be at least 3 characters.</p>
+        }
+      </div>
+
+      <div class="field-group" [class.field-group--invalid]="showRequiredError('password')">
+        <p-floatlabel variant="on">
+          <p-password
+            inputId="password"
+            formControlName="password"
+            [feedback]="false"
+            [toggleMask]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="password">Password</label>
+        </p-floatlabel>
+        @if (showRequiredError('password')) {
+          <p class="field-error">Password is required.</p>
+        }
+        @if (showMinLengthError('password')) {
+          <p class="field-error">Password must be at least 8 characters.</p>
+        }
+      </div>
+
+      <div class="field-group" [class.field-group--invalid]="showRequiredError('confirmPassword')">
+        <p-floatlabel variant="on">
+          <p-password
+            inputId="confirmPassword"
+            formControlName="confirmPassword"
+            [feedback]="false"
+            [toggleMask]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+          />
+          <label for="confirmPassword">Confirm Password</label>
+        </p-floatlabel>
+        @if (showRequiredError('confirmPassword')) {
+          <p class="field-error">Confirm password is required.</p>
+        }
+        @if (showPasswordMismatchError()) {
+          <p class="field-error">Passwords do not match.</p>
+        }
+      </div>
+
+      <!--<label class="remember-row" for="rememberMe">
+        <p-checkbox
+          inputId="rememberMe"
+          formControlName="rememberMe"
+          [binary]="true"
+        />
+        <span>Remember me</span>
+      </label>
+      -->
+      @if (submitError()) {
+        <p class="field-error">{{ submitError() }}</p>
+      }
+
+      <p-button
+        type="submit"
+        label="Sign up"
+        [loading]="isSubmitting()"
+        styleClass="signup-button"
+      />
+    </form>
+
+    <p-divider />
+
+    <p class="signin-card__footer">
+      Already have an account?
+      <a routerLink="/login">Login</a>
+    </p>
+  </p-card>
+</section>

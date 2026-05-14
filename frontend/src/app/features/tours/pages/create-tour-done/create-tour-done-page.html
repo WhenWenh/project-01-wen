@@ -1,0 +1,48 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="create-tour-done-content">
+    <div class="create-tour-done-page">
+      <header class="create-tour-done-header">
+        <h1>Create New Tour</h1>
+
+        <div class="create-tour-done-progress" aria-label="Create tour progress">
+          <h2 class="create-tour-done-progress__step">Details</h2>
+          <h2 class="create-tour-done-progress__step">Summary</h2>
+          <h2 class="create-tour-done-progress__step create-tour-done-progress__step--active">
+            Done
+          </h2>
+        </div>
+      </header>
+
+      <section class="create-tour-done-state">
+        <div
+          class="create-tour-done-state__illustration"
+          [class.create-tour-done-state__illustration--error]="result.status === 'error'"
+          aria-hidden="true"
+        >
+          <span>{{ result.status === 'success' ? '✓' : '!' }}</span>
+        </div>
+
+        <h3>{{ result.title }}</h3>
+        <p>{{ result.message }}</p>
+
+        <div class="create-tour-done-actions">
+          <button
+            type="button"
+            class="create-tour-done-actions__button create-tour-done-actions__button--secondary"
+            (click)="goToDashboard()"
+          >
+            Go back to Dashboard
+          </button>
+
+          <button
+            type="button"
+            class="create-tour-done-actions__button create-tour-done-actions__button--primary"
+            (click)="goToPrimaryDestination()"
+          >
+            {{ result.status === 'success' ? 'Go to tour' : 'Back to summary' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  </section>
+</app-shell>
