@@ -1,0 +1,475 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AuthController {
+  + AuthController(UserService, AuthService, CurrentUserService):
+  + register(RegisterRequest): AuthResponse
+  + logout(String): void
+  + login(LoginRequest): LoginResponse
+  + deleteUser(): void
+}
+entity AuthResponse << record >> {
+  + AuthResponse(UUID, String, Instant, String):
+  + userId(): UUID
+  + token(): String
+  + createdAt(): Instant
+  + username(): String
+}
+interface AuthService << interface >> {
+  + logout(String): void
+  + parseToken(String): TokenPayload
+  + login(String, String): LoginResponse
+}
+class AuthServiceImpl {
+  + AuthServiceImpl(PasswordHasher, TokenService, SessionRepository, UserRepository, long):
+  + logout(String): void
+  + login(String, String): LoginResponse
+  + parseToken(String): TokenPayload
+}
+class BackendApplicationTests {
+  ~ BackendApplicationTests():
+  ~ contextLoads(): void
+}
+class FavoriteController {
+  + FavoriteController(FavoriteService):
+  + removeFavorite(UUID, JwtUserDetails): ResponseEntity<Void>
+  + addFavorite(UUID, JwtUserDetails): ResponseEntity<Void>
+}
+interface FavoriteService << interface >> {
+  + addFavorite(UUID, UUID): void
+  + removeFavorite(UUID, UUID): void
+}
+class FavoriteServiceImpl {
+  + FavoriteServiceImpl(UserFavoriteTourRepository, TourRepository):
+  + removeFavorite(UUID, UUID): void
+  + addFavorite(UUID, UUID): void
+}
+class ImageDownloadController {
+  + ImageDownloadController(ImageService, CurrentUserService):
+  + downloadTourImage(UUID): ResponseEntity<Resource>
+}
+interface ImageService << interface >> {
+  + uploadTourImage(UUID, UUID, String, MultipartFile): TourDto
+  + downloadTourImage(UUID, UUID): Resource
+}
+class ImageServiceImpl {
+  + ImageServiceImpl(ImageStorageProperties, TourRepository):
+  - storeFile(UUID, String, MultipartFile): String
+  - getExtension(String): String
+  + uploadTourImage(UUID, UUID, String, MultipartFile): TourDto
+  + downloadTourImage(UUID, UUID): Resource
+  - sanitizeUsername(String): String
+}
+class ImageUploadController {
+  + ImageUploadController(ImageService, CurrentUserService):
+  + uploadTourImage(UUID, MultipartFile, Principal): ResponseEntity<TourDto>
+}
+class LoggerService {
+  + LoggerService():
+  - INSTANCE: LoggerService
+  + getLogger(Class<?>): Logger
+   INSTANCE: LoggerService
+}
+entity LoginRequest << record >> {
+  + LoginRequest(String, String):
+  + username(): String
+  + password(): String
+}
+entity LoginResponse << record >> {
+  + LoginResponse(String, Instant, UUID):
+  + expiresAt(): Instant
+  + token(): String
+  + sessionId(): UUID
+}
+class OrsProfileMapper {
+  - OrsProfileMapper():
+  + toOrsProfile(TourType): String
+}
+entity RegisterRequest << record >> {
+  + RegisterRequest(String, String, String):
+  + username(): String
+  + password(): String
+  + email(): String
+}
+class Route {
+  + Route():
+  + Route(UUID, UUID, Integer, Integer, List<List<Double>>):
+  - tourId: UUID
+  - duration: Integer
+  - id: UUID
+  - distance: Integer
+  - coordinates: List<List<Double>>
+   duration: Integer
+   id: UUID
+   tourId: UUID
+   coordinates: List<List<Double>>
+   distance: Integer
+}
+class RouteController {
+  + RouteController(RouteService):
+  + getRouteForTour(UUID, JwtUserDetails): ResponseEntity<RouteDto>
+}
+entity RouteDto << record >> {
+  + RouteDto(int, int, List<List<Double>>):
+  + coordinates(): List<List<Double>>
+  + duration(): int
+  + distance(): int
+}
+interface RouteService << interface >> {
+  + getRouteForTour(UUID, UUID): RouteDto
+}
+interface RouteServiceClient << interface >> {
+  + calculateRoute(String, String, String): RouteDto
+}
+class RouteServiceClientImpl {
+  + RouteServiceClientImpl():
+  + calculateRoute(String, String, String): RouteDto
+}
+class RouteServiceImpl {
+  + RouteServiceImpl(RouteRepository, TourRepository, RouteServiceClient):
+  + getRouteForTour(UUID, UUID): RouteDto
+}
+class Session {
+  # Session():
+  + Session(UUID, UUID, String, Instant, Instant, boolean):
+  - issuedAt: Instant
+  - expiresAt: Instant
+  - revoked: boolean
+  - token: String
+  - jti: UUID
+  - userId: UUID
+   expiresAt: Instant
+   token: String
+   issuedAt: Instant
+   revoked: boolean
+   jti: UUID
+   userId: UUID
+}
+interface SessionCleanupService << interface >> {
+  + cleanupRevokedAndExpiredSessions(): void
+}
+class SessionCleanupServiceImpl {
+  + SessionCleanupServiceImpl(SessionRepository):
+  + cleanupRevokedAndExpiredSessions(): void
+}
+entity SessionDto << record >> {
+  + SessionDto(UUID, UUID, String, Instant, Instant, boolean):
+  + jti(): UUID
+  + expiresAt(): Instant
+  + revoked(): boolean
+  + userId(): UUID
+  + token(): String
+  + issuedAt(): Instant
+}
+class Tour {
+  + Tour(UUID, UUID, String, String, String, TourType, String, String):
+  # Tour():
+  - description: String
+  - name: String
+  - id: UUID
+  - imagePath: String
+  - startName: String
+  - tourType: TourType
+  - createdBy: UUID
+  - endName: String
+   endName: String
+   name: String
+   description: String
+   createdBy: UUID
+   id: UUID
+   startName: String
+   tourType: TourType
+   imagePath: String
+}
+class TourController {
+  + TourController(TourService):
+  + all(JwtUserDetails): List<TourListResponse>
+  + getById(UUID, boolean, JwtUserDetails): Object
+  + delete(UUID, JwtUserDetails): void
+  + allNotFav(JwtUserDetails): List<TourTypeListResponse>
+  + create(TourDto, JwtUserDetails): TourDto
+  + update(UUID, TourDto, JwtUserDetails): TourDto
+  + allFav(JwtUserDetails): List<TourTypeListResponse>
+}
+class TourDto {
+  + TourDto(String, String, String, String, TourType, String, String):
+  + TourDto():
+  + TourDto(UUID, UUID, String, String, String, TourType, String, String):
+  - id: UUID
+  - imagePath: String
+  - endName: String
+  - tourType: TourType
+  - startName: String
+  - createdBy: UUID
+  - description: String
+  - name: String
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+  + builder(): TourDtoBuilder
+  # canEqual(Object): boolean
+   endName: String
+   name: String
+   description: String
+   createdBy: UUID
+   id: UUID
+   startName: String
+   tourType: TourType
+   imagePath: String
+}
+class TourDtoBuilder {
+  ~ TourDtoBuilder():
+  + startName(String): TourDtoBuilder
+  + imagePath(String): TourDtoBuilder
+  + build(): TourDto
+  + name(String): TourDtoBuilder
+  + toString(): String
+  + createdBy(UUID): TourDtoBuilder
+  + endName(String): TourDtoBuilder
+  + tourType(TourType): TourDtoBuilder
+  + id(UUID): TourDtoBuilder
+  + description(String): TourDtoBuilder
+}
+entity TourListResponse << record >> {
+  + TourListResponse(String, String):
+  + id(): String
+  + name(): String
+}
+class TourLog {
+  + TourLog(UUID, UUID, UUID, Instant, Integer, Integer, Integer, Integer, String):
+  # TourLog():
+  - tourId: UUID
+  - rating: Integer
+  - totalTime: Integer
+  - id: UUID
+  - createdBy: UUID
+  - difficulty: Integer
+  - totalDistance: Integer
+  - comment: String
+  - dateTime: Instant
+   comment: String
+   difficulty: Integer
+   tourId: UUID
+   totalDistance: Integer
+   dateTime: Instant
+   createdBy: UUID
+   id: UUID
+   totalTime: Integer
+   rating: Integer
+}
+class TourLogController {
+  + TourLogController(TourLogService):
+  + update(UUID, TourLogDto, JwtUserDetails): ResponseEntity<TourLogDto>
+  + getByTourId(UUID, JwtUserDetails): ResponseEntity<List<TourLogDto>>
+  + create(TourLogDto, JwtUserDetails): ResponseEntity<TourLogDto>
+  + all(JwtUserDetails): ResponseEntity<List<TourLogDto>>
+  + getById(UUID, JwtUserDetails): ResponseEntity<TourLogDto>
+  + delete(UUID, JwtUserDetails): ResponseEntity<Void>
+}
+class TourLogDto {
+  + TourLogDto(UUID, UUID, Instant, Integer, Integer, Integer, Integer, String):
+  + TourLogDto():
+  - id: UUID
+  - tourId: UUID
+  - totalTime: Integer
+  - rating: Integer
+  - dateTime: Instant
+  - difficulty: Integer
+  - comment: String
+  - totalDistance: Integer
+  + toString(): String
+  # canEqual(Object): boolean
+  + builder(): TourLogDtoBuilder
+  + hashCode(): int
+  + equals(Object): boolean
+   comment: String
+   difficulty: Integer
+   tourId: UUID
+   totalDistance: Integer
+   dateTime: Instant
+   id: UUID
+   totalTime: Integer
+   rating: Integer
+}
+class TourLogDtoBuilder {
+  ~ TourLogDtoBuilder():
+  + tourId(UUID): TourLogDtoBuilder
+  + rating(Integer): TourLogDtoBuilder
+  + dateTime(Instant): TourLogDtoBuilder
+  + difficulty(Integer): TourLogDtoBuilder
+  + totalTime(Integer): TourLogDtoBuilder
+  + comment(String): TourLogDtoBuilder
+  + toString(): String
+  + totalDistance(Integer): TourLogDtoBuilder
+  + build(): TourLogDto
+  + id(UUID): TourLogDtoBuilder
+}
+class TourLogMapper {
+  + TourLogMapper():
+  + fromCreateRequest(UUID, UUID, TourLogDto): TourLog
+  + toListResponseList(List<TourLog>): List<TourLogDto>
+  + toListResponse(TourLog): TourLogDto
+  + updateEntity(TourLogDto, TourLog): void
+  + toResponse(TourLog): TourLogDto
+}
+interface TourLogService << interface >> {
+  + findByIdAndUser(UUID, UUID): TourLogDto
+  + findAllByUser(UUID): List<TourLogDto>
+  + update(UUID, TourLogDto, UUID): TourLogDto
+  + deleteByUser(UUID, UUID): void
+  + findAllByTourAndUser(UUID, UUID): List<TourLogDto>
+  + create(TourLogDto, UUID): TourLogDto
+}
+class TourLogServiceImpl {
+  + TourLogServiceImpl(TourLogRepository):
+  + update(UUID, TourLogDto, UUID): TourLogDto
+  + findAllByTourAndUser(UUID, UUID): List<TourLogDto>
+  + create(TourLogDto, UUID): TourLogDto
+  + findAllByUser(UUID): List<TourLogDto>
+  + deleteByUser(UUID, UUID): void
+  + findByIdAndUser(UUID, UUID): TourLogDto
+}
+class TourMapper {
+  + TourMapper():
+  + fromCreateRequest(UUID, UUID, TourDto): Tour
+  + toListResponse(Tour): TourListResponse
+  + toTourResponseList(List<Tour>): List<TourListResponse>
+  + toTypeListResponse(Tour): TourTypeListResponse
+  + updateEntity(TourDto, Tour): void
+  + toResponse(Tour): TourDto
+  + toWithFavoriteResponse(Tour, boolean): TourWithFavoriteDto
+  + toTourTypeResponseList(List<Tour>): List<TourTypeListResponse>
+}
+class TourPlannerApplication {
+  + TourPlannerApplication():
+  ~ main(String[]): void
+  + run(String[]): void
+}
+interface TourService << interface >> {
+  + findByIdAndUser(UUID, UUID): TourDto
+  + update(UUID, UUID, TourDto): TourDto
+  + deleteByUser(UUID, UUID): void
+  + create(UUID, TourDto, UUID): TourDto
+  + findAllFavByUser(UUID): List<TourTypeListResponse>
+  + findAllByUser(UUID): List<TourListResponse>
+  + findAllNotFavByUser(UUID): List<TourTypeListResponse>
+  + findByIdAndUserWithFavorite(UUID, UUID): TourWithFavoriteDto
+}
+class TourServiceImpl {
+  + TourServiceImpl(TourRepository, RouteRepository, UserFavoriteTourRepository, RouteServiceClient):
+  + findAllFavByUser(UUID): List<TourTypeListResponse>
+  + findByIdAndUser(UUID, UUID): TourDto
+  - createOrUpdateRoute(Tour): void
+  + create(UUID, TourDto, UUID): TourDto
+  + findByIdAndUserWithFavorite(UUID, UUID): TourWithFavoriteDto
+  + deleteByUser(UUID, UUID): void
+  + findAllNotFavByUser(UUID): List<TourTypeListResponse>
+  + findAllByUser(UUID): List<TourListResponse>
+  + update(UUID, UUID, TourDto): TourDto
+}
+enum TourType << enumeration >> {
+  - TourType():
+  + values(): TourType[]
+  + valueOf(String): TourType
+}
+entity TourTypeListResponse << record >> {
+  + TourTypeListResponse(String, String, TourType):
+  + name(): String
+  + tourType(): TourType
+  + id(): String
+}
+class TourWithFavoriteDto {
+  + TourWithFavoriteDto(String, String, String, String, TourType, String, String, boolean):
+  - favorite: boolean
+   favorite: boolean
+}
+class UUIDv7 {
+  + UUIDv7():
+  + randomBytes(): byte[]
+  + randomUUID(): UUID
+}
+class UpdateProjectStructure {
+  + UpdateProjectStructure():
+  + update(): void
+  ~ main(): void
+  + exportProjectStructure(): void
+}
+class User {
+  + User(UUID, String, String, String, Instant):
+  # User():
+  - username: String
+  - passwordHash: String
+  - id: UUID
+  - email: String
+  - createdAt: Instant
+   passwordHash: String
+   id: UUID
+   username: String
+   email: String
+   createdAt: Instant
+}
+entity UserDto << record >> {
+  + UserDto(UUID, String, String, String):
+  + UserDto(UUID, String, String, String, Instant):
+  - id: UUID
+  + createdAt(): Instant
+  + email(): String
+  + username(): String
+  + id(): UUID
+  + passwordHash(): String
+   id: UUID
+}
+class UserFavoriteTour {
+  + UserFavoriteTour(UUID, UUID):
+  + UserFavoriteTour():
+  - userId: UUID
+  - tourId: UUID
+   tourId: UUID
+   userId: UUID
+}
+class UserFavoriteTourId {
+  + UserFavoriteTourId():
+  + hashCode(): int
+  + equals(Object): boolean
+}
+interface UserService << interface >> {
+  + deleteUser(UUID): void
+  + register(String, String, String): UserDto
+  + validateCredentials(String, String): void
+}
+class UserServiceImpl {
+  + UserServiceImpl(UserRepository, PasswordHasher):
+  + register(String, String, String): UserDto
+  + validateCredentials(String, String): void
+  + deleteUser(UUID): void
+}
+
+AuthController            "1" *-[#595959,plain]-> "authService\n1" AuthService
+AuthController            "1" *-[#595959,plain]-> "userService\n1" UserService
+AuthServiceImpl            -[#008200,dashed]-^  AuthService
+FavoriteController        "1" *-[#595959,plain]-> "favoriteService\n1" FavoriteService
+FavoriteServiceImpl        -[#008200,dashed]-^  FavoriteService
+ImageDownloadController   "1" *-[#595959,plain]-> "imageService\n1" ImageService
+ImageServiceImpl           -[#008200,dashed]-^  ImageService
+ImageUploadController     "1" *-[#595959,plain]-> "imageService\n1" ImageService
+RouteController           "1" *-[#595959,plain]-> "routeService\n1" RouteService
+RouteServiceClientImpl     -[#008200,dashed]-^  RouteServiceClient
+RouteServiceImpl           -[#008200,dashed]-^  RouteService
+RouteServiceImpl          "1" *-[#595959,plain]-> "routeClient\n1" RouteServiceClient
+SessionCleanupServiceImpl  -[#008200,dashed]-^  SessionCleanupService
+Tour                      "1" *-[#595959,plain]-> "tourType\n1" TourType
+TourController            "1" *-[#595959,plain]-> "service\n1" TourService
+TourDto                   "1" *-[#595959,plain]-> "tourType\n1" TourType
+TourDtoBuilder             +-[#820000,plain]-  TourDto
+TourDtoBuilder            "1" *-[#595959,plain]-> "tourType\n1" TourType
+TourLogController         "1" *-[#595959,plain]-> "service\n1" TourLogService
+TourLogDtoBuilder          +-[#820000,plain]-  TourLogDto
+TourLogServiceImpl         -[#008200,dashed]-^  TourLogService
+TourServiceImpl           "1" *-[#595959,plain]-> "routeClient\n1" RouteServiceClient
+TourServiceImpl            -[#008200,dashed]-^  TourService
+TourWithFavoriteDto        -[#000082,plain]-^  TourDto
+UserServiceImpl            -[#008200,dashed]-^  UserService
+@enduml

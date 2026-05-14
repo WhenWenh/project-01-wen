@@ -1,0 +1,1 @@
+find . -type f -exec sh -c 'echo "{}"; cat "{}"; echo' \; > ~/IdeaProjects/Tour_Planner/backend/docs/contend.txt

@@ -1,0 +1,520 @@
+{
+  "info": {
+    "name": "TourPlanner Postman",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.1.1"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/user/register",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "user", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"pass123\",\n  \"email\": \"user1@mail.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/user/login",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "user", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"pass123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "// store JWT token from login response",
+                  "pm.environment.set(\"jwt_token\", jsonData.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tours",
+          "item": [
+            {
+              "name": "Create Tour",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Vienna Walk\",\n  \"description\": \"Nice tour through Vienna\",\n  \"tourType\": \"BIKE\",\n  \"startName\": \"Stephansplatz\",\n  \"endName\": \"Prater\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.environment.set(\"tour_id\", jsonData.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get All Tours",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours"]
+                }
+              }
+            },
+            {
+              "name": "Get Tour By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours/{{tour_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours", "{{tour_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Update Tour",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours/{{tour_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours", "{{tour_id}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Vienna Walk UPDATED\",\n  \"description\": \"Updated description\",\n  \"tourType\": \"RUNNING\",\n  \"startName\": \"Karlsplatz\",\n  \"endName\": \"Donauinsel\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Route For Tour",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }],
+                "url": "http://localhost:8080/api/tours/{{tour_id}}/route"
+              }
+            },
+            {
+              "name": "Create Tour Log",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tourId\": \"{{tour_id}}\",\n  \"dateTime\": \"2026-03-29T15:00:00Z\",\n  \"rating\": 5,\n  \"difficulty\": 3,\n  \"totalDistance\": 12,\n  \"totalTime\": 95,\n  \"comment\": \"Amazing tour!\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.environment.set(\"tour_log_id\", jsonData.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create second Tour Log",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tourId\": \"{{tour_id}}\",\n  \"dateTime\": \"2026-03-29T15:00:00Z\",\n  \"rating\": 3,\n  \"difficulty\": 1,\n  \"totalDistance\": 20,\n  \"totalTime\": 135,\n  \"comment\": \"Also nice!\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.environment.set(\"tour_log_id\", jsonData.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get All Tour Logs",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs"]
+                }
+              }
+            },
+            {
+              "name": "Get Tour Log By Log-ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs/{{tour_log_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs", "{{tour_log_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Update Tour Log",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs/{{tour_log_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs", "{{tour_log_id}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rating\": 4,\n  \"difficulty\": 2,\n  \"totalDistance\": 17,\n  \"totalTime\": 88,\n  \"comment\": \"Still great, small update\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get all Tour Logs by tour-ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs/tour/{{tour_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs", "tour", "{{tour_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Upload Tour Image",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours/{{tour_id}}/image",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours", "{{tour_id}}", "image"]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "/opt/tourplanner/images/Tour.png"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Download Tour Image",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours/{{tour_id}}/image",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours", "{{tour_id}}", "image"]
+                }
+              }
+            },
+            {
+              "name": "Get Favorite Tours (created by me)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": "http://localhost:8080/api/tours/favorites"
+              }
+            },
+            {
+              "name": "Get Not Favorite Tours (created by me)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": "http://localhost:8080/api/tours/not-favorites"
+              }
+            },
+            {
+              "name": "Favorites",
+              "item": [
+                {
+                  "name": "Add Favorite",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                    ],
+                    "url": {
+                      "raw": "http://localhost:8080/api/users/me/favorites/{{tour_id}}",
+                      "host": ["http://localhost:8080"],
+                      "path": ["api", "users", "me", "favorites", "{{tour_id}}"]
+                    }
+                  },
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test(\"Status is 204\", function () {",
+                          "  pm.response.to.have.status(204);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Favorite Tours (created by me)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                    ],
+                    "url": "http://localhost:8080/api/tours/favorites"
+                  }
+                },
+                {
+                  "name": "Get Not Favorite Tours (created by me)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                    ],
+                    "url": "http://localhost:8080/api/tours/not-favorites"
+                  }
+                },
+                {
+                  "name": "Get Tour By ID with favorite status",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                    ],
+                    "url": {
+                      "raw": "http://localhost:8080/api/tours/{{tour_id}}?withFavorite=true",
+                      "host": ["http://localhost"],
+                      "port": "8080",
+                      "path": ["api", "tours", "{{tour_id}}"],
+                      "query": [
+                        {
+                          "key": "withFavorite",
+                          "value": "true"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "Remove Favorite",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [
+                      { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                    ],
+                    "url": {
+                      "raw": "http://localhost:8080/api/users/me/favorites/{{tour_id}}",
+                      "host": ["http://localhost:8080"],
+                      "path": ["api", "users", "me", "favorites", "{{tour_id}}"]
+                    }
+                  },
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test(\"Status is 204\", function () {",
+                          "  pm.response.to.have.status(204);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Delete Tour Log",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tour-logs/{{tour_log_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tour-logs", "{{tour_log_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Delete Tour",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                ],
+                "url": {
+                  "raw": "http://localhost:8080/api/tours/{{tour_id}}",
+                  "host": ["http://localhost:8080"],
+                  "path": ["api", "tours", "{{tour_id}}"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/user/logout",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "user", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/user/login",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "user", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"pass123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "// adjust field name depending on your LoginResponse",
+                  "// e.g. jsonData.token or jsonData.accessToken",
+                  "pm.environment.set(\"jwt_token\", jsonData.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete User (Unregister)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/user",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "user"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

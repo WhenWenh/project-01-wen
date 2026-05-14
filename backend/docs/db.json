@@ -1,0 +1,30 @@
+{
+  "tour": {
+    "id": "018f5e6a-8b2c-7c1a-b3d4-9f2a6c7e8d90",
+    "created": "johndoe",
+    "name": "Sample Tour",
+    "description": "Short description of the tour.",
+    "start_name": "Start Point",
+    "end_name": "End Point",
+    "route": {
+      "id": "018f5e8c-91ab-7a2d-b5c3-2d7e9f0a5678",
+      "tourType": "CAR",
+      "distance": 185000,
+      "duration": 7200,
+      "coordinates": [
+        [48.2082, 16.3738],
+        [48.2500, 16.4000],
+        [48.3069, 14.2858]
+      ]
+    },
+    "tourLogs": [
+      {
+        "id": "018f5e7b-3c91-7f4e-a2b1-6c9d0e4f1234",
+        "created": "johndoe",
+        "dateTime": "2026-03-27T14:30:00Z",
+        "rating": 4,
+        "comment": "Smooth ride, minor traffic near the end."
+      }
+    ]
+  }
+}

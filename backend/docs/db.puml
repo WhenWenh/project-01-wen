@@ -1,0 +1,84 @@
+@startuml
+hide circle
+skinparam linetype ortho
+
+entity users {
+  +id : UUID <<PK>>
+  --
+  username : VARCHAR(50) <<U>>
+  password_hash : VARCHAR(255)
+  email : VARCHAR(100) <<U>>
+  verified : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity login_tokens {
+  +id : UUID <<PK>>
+  --
+  user_id : UUID <<FK>>
+  token : VARCHAR(255) <<U>>
+  created_at : TIMESTAMP
+}
+
+entity sessions {
+  +id : UUID <<PK>>
+  --
+  jti : UUID <<U>>
+  user_id : UUID <<FK>>
+  token : TEXT
+  issued_at : TIMESTAMP
+  expires_at : TIMESTAMP
+  revoked : BOOLEAN
+}
+
+entity tours {
+  +id : UUID <<PK>>
+  --
+  created_by : UUID <<FK>>
+  name : TEXT
+  description : TEXT
+  image_path : TEXT
+  tour_type : TEXT
+  start_name : TEXT
+  end_name : TEXT
+}
+
+entity routes {
+  +id : UUID <<PK>>
+  --
+  tour_id : UUID <<FK>> <<U>>
+  distance : INTEGER
+  duration : INTEGER
+  coordinates : JSONB
+}
+
+entity tour_logs {
+  +id : UUID <<PK>>
+  --
+  tour_id : UUID <<FK>>
+  created_by : UUID <<FK>>
+  date_time : TIMESTAMP
+  rating : INTEGER
+  difficulty : INTEGER
+  total_distance : INTEGER
+  total_time : INTEGER
+  comment : TEXT
+}
+
+entity user_favorite_tours {
+  +user_id : UUID <<FK>> <<PK>>
+  +tour_id : UUID <<FK>> <<PK>>
+}
+
+' Relationships
+users ||--o{ login_tokens
+users ||--o{ sessions
+users ||--o{ tours : created_by
+users ||--o{ tour_logs : created_by
+users ||--o{ user_favorite_tours
+
+tours ||--|| routes
+tours ||--o{ tour_logs
+tours ||--o{ user_favorite_tours
+
+@enduml
