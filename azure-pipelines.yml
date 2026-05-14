@@ -7,74 +7,59 @@ pool:
 variables:
   - group: KeyVaultVariables
 
-# Define a job to build, test, and deploy the application
-jobs:
-  - job: build_test_deploy
-    displayName: "Build, test, and deploy"
-    timeoutInMinutes: 10
-    steps:
-      # Checkout
-      - checkout: self
-        persistCredentials: true
+stages:
+  - stage: Build
+    displayName: "Build backend"
+    jobs:
+      - job: backend
+        displayName: "Build and test backend"
+        timeoutInMinutes: 10
+        steps:
+          - checkout: self
 
-      # Install JDK 25
-      - script: |
-          set -e
-          
-          curl -L -o jdk25.tar.gz https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse
-          tar -xzf jdk25.tar.gz
-          
-          JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-25*" | head -n 1)
-          
-          echo "##vso[task.setvariable variable=JAVA_HOME]$JDK_DIR"
-          echo "Installed JDK at $JDK_DIR"
-          
-          $JDK_DIR/bin/java -version
-        displayName: "Install JDK 25 (Temurin)"
+          - task: JavaToolInstaller@0
+            displayName: "Use Java 21"
+            inputs:
+              versionSpec: "21"
+              jdkArchitectureOption: "x64"
+              jdkSourceOption: "PreInstalled"
 
-      # Prepare Maven cache directory
-      - script: mkdir -p /home/vsts/.m2/repository
-        displayName: "Prepare Maven cache directory"
+          - task: Cache@2
+            displayName: "Cache Maven dependencies"
+            inputs:
+              key: 'maven | "$(Agent.OS)" | backend/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+              path: ~/.m2/repository
 
-      # Cache Maven dependencies
-      - task: Cache@2
-        inputs:
-          key: 'maven | "$(Agent.OS)" | **/pom.xml'
-          restoreKeys: |
-            maven | "$(Agent.OS)"
-          path: /home/vsts/.m2/repository
+          - script: chmod +x ./mvnw
+            displayName: "Make Maven wrapper executable"
+            workingDirectory: backend
 
-      # Build
-      - script: mvn -B clean package -DskipTests
-        displayName: "Build (Maven)"
-        env:
-          JAVA_HOME: $(JAVA_HOME)
-          PATH: $(JAVA_HOME)/bin:$(PATH)
+          - script: ./mvnw -B clean package
+            displayName: "Build and test backend"
+            workingDirectory: backend
+            env:
+              DB_USER: $(db-user)
+              DB_PASSWORD: $(db-password)
+              DB_NAME: $(db-name)
+              DB_PORT: $(db-port)
+              JWT_SECRET: $(jwt-secret-base64)
 
-      # Run
-      - script: java -cp target/project-02-1.0-SNAPSHOT.jar org.example.Main
-        displayName: "Run application"
-        env:
-          JAVA_HOME: $(JAVA_HOME)
-          PATH: $(JAVA_HOME)/bin:$(PATH)
-          DB_USER: $(db-user)
-          DB_PASSWORD: $(db-password)
-          JWT_SECRET: $(jwt-secret-base64)
+          - task: PublishTestResults@2
+            displayName: "Publish backend test results"
+            inputs:
+              testResultsFiles: "backend/target/surefire-reports/TEST-*.xml"
+              testRunTitle: "Backend JUnit Tests"
+            condition: succeededOrFailed()
 
-      # Test
-      - script: mvn -B test
-        displayName: "Test (JUnit)"
-        env:
-          JAVA_HOME: $(JAVA_HOME)
-          PATH: $(JAVA_HOME)/bin:$(PATH)
-
-      # Publish test results
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFiles: '**/surefire-reports/TEST-*.xml'
-          testRunTitle: 'JUnit Tests'
-        condition: succeededOrFailed()
-
-      # Deploy (placeholder)
-      - script: echo "Deploy step"
-        displayName: "Deploy"
+  - stage: Release
+    displayName: "Release"
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - job: release_placeholder
+        displayName: "Release placeholder"
+        steps:
+          - script: echo "Release stage placeholder - deployment will be added later."
+            displayName: "Release placeholder"
