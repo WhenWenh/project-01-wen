@@ -1,0 +1,215 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="edit-tour-content">
+    <div class="edit-tour-shell">
+      <header class="edit-tour-header">
+        <div>
+          <div class="edit-tour-title-row">
+            <button
+              type="button"
+              class="edit-tour-back-icon"
+              aria-label="Back to tour details"
+              (click)="goBack()"
+            >
+              <span class="pi pi-arrow-left" aria-hidden="true"></span>
+            </button>
+            <h1>Edit Tour</h1>
+          </div>
+          <h2>Update the existing tour details and save your changes.</h2>
+          <app-page-breadcrumb [items]="breadcrumbItems()" />
+        </div>
+      </header>
+
+      @if (isLoadingTour()) {
+        <section class="edit-tour-card">
+          <h3>Loading tour...</h3>
+          <p class="edit-tour-card__subtitle">The edit form is being prepared.</p>
+        </section>
+      } @else if (loadError()) {
+        <section class="edit-tour-card">
+          <h3>Could not load tour</h3>
+          <p class="edit-tour-card__subtitle">{{ loadError() }}</p>
+        </section>
+      } @else {
+        <section class="edit-tour-card">
+          <h3>Edit Tour Details</h3>
+          <h4 class="edit-tour-card__subtitle">Adjust the basic details of your existing tour</h4>
+
+          @if (saveError()) {
+            <div class="edit-tour-form-error">
+              {{ saveError() }}
+            </div>
+          }
+
+          <form [formGroup]="editForm" class="edit-tour-form">
+            <div class="edit-tour-form__row edit-tour-form__row--wide">
+              <label
+                class="edit-tour-field"
+                [class.edit-tour-field--invalid]="showRequiredError('name')"
+              >
+                <span>Tour Name</span>
+                <input
+                  type="text"
+                  formControlName="name"
+                  [class.edit-tour-field__control--invalid]="showRequiredError('name')"
+                />
+                @if (showRequiredError('name')) {
+                  <small class="edit-tour-field__error">Tour name is required.</small>
+                }
+              </label>
+
+              <label
+                class="edit-tour-field edit-tour-field--compact edit-tour-field--select"
+                [class.edit-tour-field--invalid]="showRequiredError('tourType')"
+              >
+                <span>Tour Type</span>
+                <span class="edit-tour-field__select-wrap">
+                  <select
+                    formControlName="tourType"
+                    [class.edit-tour-field__control--invalid]="showRequiredError('tourType')"
+                  >
+                    <option value=""></option>
+                    <option value="BIKE">{{ tourTypeLabel('BIKE') }}</option>
+                    <option value="HIKE">{{ tourTypeLabel('HIKE') }}</option>
+                    <option value="RUNNING">{{ tourTypeLabel('RUNNING') }}</option>
+                    <option value="VACATION">{{ tourTypeLabel('VACATION') }}</option>
+                  </select>
+                </span>
+                @if (showRequiredError('tourType')) {
+                  <small class="edit-tour-field__error">Tour type is required.</small>
+                }
+              </label>
+            </div>
+
+            <div class="edit-tour-form__row">
+              <label
+                class="edit-tour-field"
+                [class.edit-tour-field--invalid]="showRequiredError('from')"
+              >
+                <span>From</span>
+                <input
+                  type="text"
+                  formControlName="from"
+                  [class.edit-tour-field__control--invalid]="showRequiredError('from')"
+                />
+                @if (showRequiredError('from')) {
+                  <small class="edit-tour-field__error">Start location is required.</small>
+                }
+              </label>
+
+              <label
+                class="edit-tour-field"
+                [class.edit-tour-field--invalid]="showRequiredError('to')"
+              >
+                <span>To</span>
+                <input
+                  type="text"
+                  formControlName="to"
+                  [class.edit-tour-field__control--invalid]="showRequiredError('to')"
+                />
+                @if (showRequiredError('to')) {
+                  <small class="edit-tour-field__error">Destination is required.</small>
+                }
+              </label>
+            </div>
+
+            <label
+              class="edit-tour-field edit-tour-field--textarea"
+              [class.edit-tour-field--invalid]="showRequiredError('description')"
+            >
+              <span>Description</span>
+              <textarea
+                [class.edit-tour-field__control--invalid]="
+                  isDescriptionTooLong || showRequiredError('description')
+                "
+                formControlName="description"
+              ></textarea>
+              @if (showRequiredError('description')) {
+                <small class="edit-tour-field__error">Description is required.</small>
+              }
+              <small [class.edit-tour-field__counter--invalid]="isDescriptionTooLong">
+                {{ descriptionLength }}/{{ maxDescriptionLength }}
+              </small>
+            </label>
+
+            <div class="edit-tour-field edit-tour-field--upload">
+              <span>Image</span>
+              <div class="edit-tour-upload">
+                <input
+                  #imageInput
+                  type="file"
+                  accept="image/*"
+                  class="edit-tour-upload__input"
+                  (change)="onImageSelected($event)"
+                />
+
+                <button
+                  type="button"
+                  class="edit-tour-upload__button"
+                  (click)="imageInput.click()"
+                >
+                  {{ currentImageName ? 'Replace image' : 'Choose image' }}
+                </button>
+
+                <small class="edit-tour-upload__hint">
+                  The selected file is uploaded when you save the tour.
+                </small>
+
+                @if (hasPendingImageSelection) {
+                  <div class="edit-tour-upload__file">
+                    <span class="edit-tour-upload__file-name">{{ selectedImageName }}</span>
+                    <span class="edit-tour-upload__badge">Selected</span>
+                    <button
+                      type="button"
+                      class="edit-tour-upload__remove"
+                      aria-label="Remove selected image"
+                      (click)="clearSelectedImage(imageInput)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                } @else if (currentImageName) {
+                  <div class="edit-tour-upload__file">
+                    <span class="edit-tour-upload__file-name">{{ currentImageName }}</span>
+                    <span class="edit-tour-upload__badge edit-tour-upload__badge--saved">
+                      Uploaded
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          </form>
+
+          @if (canShowEditActions) {
+            <div class="edit-tour-actions">
+              <button
+                type="button"
+                class="edit-tour-actions__button edit-tour-actions__button--secondary"
+                (click)="goBack()"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                class="edit-tour-actions__button edit-tour-actions__button--primary"
+                (click)="saveTour()"
+              >
+                {{ isSaving ? 'Saving...' : 'Save changes' }}
+              </button>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  </section>
+</app-shell>
+
+<app-confirm-dialog
+  [visible]="showLeaveDialog"
+  title="Leave edit tour?"
+  message="Do you really want to leave this page? Your current changes will be lost."
+  confirmLabel="Leave page"
+  cancelLabel="Stay here"
+  (confirm)="confirmLeave()"
+  (cancel)="stayOnPage()"
+/>

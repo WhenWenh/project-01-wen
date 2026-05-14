@@ -1,0 +1,91 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="select-tour-content">
+    <div class="select-tour-shell">
+      <header class="select-tour-header">
+        <div>
+          <div class="select-tour-title-row">
+            <button
+              type="button"
+              class="select-tour-back-icon"
+              aria-label="Back to tour logs"
+              (click)="goBack()"
+            >
+              <span class="pi pi-arrow-left" aria-hidden="true"></span>
+            </button>
+            <h1>Select Tour</h1>
+          </div>
+          <p class="select-tour-description">
+            Choose the tour you want to add a new log entry for.
+          </p>
+        </div>
+      </header>
+
+      <section class="select-tour-card">
+        <div class="select-tour-card__intro">
+          <h2>Available Tours</h2>
+          <p>Search and select the tour before creating a new log.</p>
+        </div>
+
+        <div class="select-tour-search">
+          <p-iconfield class="select-tour-search-field">
+            <p-inputicon styleClass="pi pi-search" />
+            <input
+              pInputText
+              type="text"
+              placeholder="Search tours..."
+              [formControl]="searchControl"
+            />
+          </p-iconfield>
+        </div>
+
+        @if (isLoadingTours()) {
+          <div class="select-tour-empty-state">
+            <strong>Loading tours...</strong>
+            <p>The tour list is currently being fetched.</p>
+          </div>
+        } @else if (toursLoadError()) {
+          <div class="select-tour-empty-state">
+            <strong>Could not load tours.</strong>
+            <p>{{ toursLoadError() }}</p>
+          </div>
+        } @else if (!filteredTours().length) {
+          <div class="select-tour-empty-state">
+            <strong>No tours found.</strong>
+            <p>Try a different search or create a new tour first.</p>
+          </div>
+        } @else {
+          <div class="select-tour-grid">
+            @for (tour of visibleTours(); track tour.id) {
+              <article class="select-tour-card-item">
+                <div class="select-tour-card-content">
+                  <div class="select-tour-card-header">
+                  <div>
+                      <h3>{{ tour.name }}</h3>
+                      <p class="select-tour-id">ID: {{ tour.id }}</p>
+                    </div>
+                  </div>
+
+                  <div class="select-tour-card-actions">
+                    <p-button
+                      label="Select"
+                      styleClass="select-tour-action"
+                      (onClick)="selectTourForLog(tour.id)"
+                    />
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+
+          <app-pagination
+            [first]="first()"
+            [rows]="rows"
+            [totalRecords]="filteredTours().length"
+            currentPageReportTemplate="{first} - {last} of {totalRecords}"
+            (pageChange)="onPageChange($event)"
+          />
+        }
+      </section>
+    </div>
+  </section>
+</app-shell>

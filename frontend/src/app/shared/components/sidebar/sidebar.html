@@ -1,0 +1,33 @@
+<aside class="sidebar">
+  <div class="sidebar__top">
+    <a class="sidebar__brand" routerLink="/dashboard">
+      {{ title }}
+    </a>
+
+    <p-menu [model]="items" styleClass="sidebar-menu">
+      <ng-template #item let-item>
+        <a
+          class="sidebar-menu__link"
+          [routerLink]="item.routerLink"
+          routerLinkActive="sidebar-menu__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      </ng-template>
+    </p-menu>
+  </div>
+
+  <div class="sidebar__bottom">
+    <button type="button" class="sidebar__logout" (click)="logoutClick.emit()">
+      <i class="pi pi-sign-out"></i>
+      <span>{{ logoutItem.label }}</span>
+    </button>
+
+    <div class="sidebar__account">
+      <p-avatar icon="pi pi-user" shape="circle" />
+      <span>{{ footerLabel }}</span>
+    </div>
+  </div>
+</aside>

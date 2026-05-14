@@ -1,0 +1,188 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="tour-logs-content">
+    <div class="tour-logs-shell">
+      <header class="tour-logs-header">
+        <div>
+          <h1>Tour Logs</h1>
+          <p class="tour-logs-description">
+            Browse tours first, then load the logs that belong to a specific route.
+          </p>
+        </div>
+
+        <p-button
+          label="+ New Tour Log"
+          styleClass="tour-logs-new-button"
+          (onClick)="openSelectTour()"
+        />
+      </header>
+
+      <section class="tour-logs-filter-bar">
+        <p-iconfield class="tour-logs-search">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            placeholder="Search tours..."
+            [formControl]="searchControl"
+          />
+        </p-iconfield>
+      </section>
+
+      @if (isLoadingTours()) {
+        <section class="tour-logs-empty-state">
+          <h2>Loading tours...</h2>
+          <p>The tour-based log overview is currently being prepared.</p>
+        </section>
+      } @else if (toursLoadError()) {
+        <section class="tour-logs-empty-state">
+          <h2>Could not load tours</h2>
+          <p>{{ toursLoadError() }}</p>
+        </section>
+      } @else if (filteredTourCards().length > 0) {
+        <section class="tour-logs-list">
+          @for (card of visibleTourCards(); track trackTourCard($index, card)) {
+            <article class="tour-log-tour-card">
+              <div class="tour-log-tour-card__details">
+                <div class="tour-log-tour-card__intro">
+                  <h2>{{ card.name }}</h2>
+                </div>
+
+                <div class="tour-log-tour-card__meta-grid">
+                  <div class="tour-log-tour-card__meta-item">
+                    <span>Tour ID</span>
+                    <strong>{{ card.id }}</strong>
+                  </div>
+
+                  <div class="tour-log-tour-card__meta-item">
+                    <span>Log Count</span>
+                    @if (card.isLoadingCount) {
+                      <strong>Loading...</strong>
+                    } @else if (card.hasCountError) {
+                      <strong>Unavailable</strong>
+                    } @else {
+                      <strong>{{ card.logCount }}</strong>
+                    }
+                  </div>
+                </div>
+
+                <div class="tour-log-tour-card__actions">
+                  <p-button
+                    [label]="card.isExpanded ? 'Hide Logs' : 'Load Logs'"
+                    icon="pi pi-list"
+                    styleClass="tour-log-tour-card__action tour-log-tour-card__action--view"
+                    [loading]="card.isLoadingLogs"
+                    [disabled]="card.isLoadingLogs"
+                    (onClick)="toggleTourLogs(card)"
+                  />
+                </div>
+
+                @if (card.isExpanded) {
+                  <div class="tour-log-tour-card__logs">
+                    @if (card.isLoadingLogs) {
+                      <div class="tour-log-tour-card__logs-state">
+                        <strong>Loading logs...</strong>
+                        <p>The logs for this tour are currently being fetched.</p>
+                      </div>
+                    } @else if (card.logsLoadError) {
+                      <div class="tour-log-tour-card__logs-state">
+                        <strong>Could not load logs.</strong>
+                        <p>{{ card.logsLoadError }}</p>
+                      </div>
+                    } @else if (!card.logs.length) {
+                      <div class="tour-log-tour-card__logs-state">
+                        <strong>No logs for this tour yet.</strong>
+                        <p>Create a new log to start tracking this route.</p>
+                      </div>
+                    } @else {
+                      <div class="tour-log-tour-card__log-list">
+                        @for (log of card.logs; track log.id) {
+                          <article class="tour-details-log-card">
+                            <div class="tour-details-log-card__top">
+                              <div>
+                                <span class="tour-details-log-card__label">Log ID</span>
+                                <strong>{{ log.id }}</strong>
+                              </div>
+
+                              <div class="tour-details-log-actions">
+                                <button
+                                  type="button"
+                                  class="tour-details-log-action tour-details-log-action--view"
+                                  aria-label="View tour log"
+                                  (click)="openLogDetails(log.id)"
+                                >
+                                  <span class="pi pi-eye" aria-hidden="true"></span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  class="tour-details-log-action tour-details-log-action--edit"
+                                  aria-label="Edit tour log"
+                                  (click)="openEditLog(log.id)"
+                                >
+                                  <span class="pi pi-pencil" aria-hidden="true"></span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  class="tour-details-log-action tour-details-log-action--delete"
+                                  aria-label="Delete tour log"
+                                  (click)="openDeleteDialog(card, log)"
+                                >
+                                  <span class="pi pi-trash" aria-hidden="true"></span>
+                                </button>
+                              </div>
+                            </div>
+
+                            <div class="tour-details-log-grid">
+                              <div class="tour-details-log-item">
+                                <span>Date</span>
+                                <strong>{{ formatLogDate(log.dateTime) }}</strong>
+                              </div>
+
+                              <div class="tour-details-log-item">
+                                <span>Rating</span>
+                                <strong>{{ log.rating }}/5</strong>
+                              </div>
+
+                              <div class="tour-details-log-item">
+                                <span>Difficulty</span>
+                                <strong>{{ log.difficulty }}/5</strong>
+                              </div>
+                            </div>
+                          </article>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </section>
+
+        <app-pagination
+          [first]="first()"
+          [rows]="rows"
+          [totalRecords]="filteredTourCards().length"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          (pageChange)="onPageChange($event)"
+        />
+      } @else {
+        <section class="tour-logs-empty-state">
+          <h2>No tours found</h2>
+          <p>Adjust the search or create a tour first before managing tour-specific logs.</p>
+        </section>
+      }
+    </div>
+  </section>
+</app-shell>
+
+<app-confirm-dialog
+  [visible]="showDeleteDialog()"
+  title="Delete tour log"
+  [message]="'Do you really want to delete a log from ' + (selectedLogForDelete()?.tourName || 'this tour') + '? This action cannot be undone.'"
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  (confirm)="confirmDeleteLog()"
+  (cancel)="closeDeleteDialog()"
+/>

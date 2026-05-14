@@ -1,0 +1,18 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="dashboard-content">
+    <div class="dashboard-shell">
+      <div class="dashboard-header">
+        <div>
+          <h1>Welcome back, User!</h1>
+          <p>Track your tours and analyze your statistics.</p>
+        </div>
+
+        <p-button
+          label="+ New Tour"
+          styleClass="dashboard-new-tour-button"
+          (onClick)="openNewTour()"
+        />
+      </div>
+    </div>
+  </section>
+</app-shell>

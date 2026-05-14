@@ -1,0 +1,225 @@
+:host {
+  display: block;
+  background: #ffffff;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.select-tour-content {
+  padding: 2rem;
+  background: #ffffff;
+}
+
+.select-tour-shell {
+  width: 100%;
+  max-width: 1100px;
+  padding-left: 2rem;
+}
+
+.select-tour-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.select-tour-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.select-tour-back-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.select-tour-back-icon:hover {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #ea580c;
+}
+
+h1 {
+  margin: 0 0 0.7rem;
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.select-tour-description {
+  margin: 0;
+  color: #374151;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.select-tour-card {
+  border: 1px solid #d1d5db;
+  border-radius: 0.95rem;
+  background: #ffffff;
+  padding: 1.3rem;
+}
+
+.select-tour-card__intro {
+  margin-bottom: 1.2rem;
+}
+
+.select-tour-card__intro h2 {
+  margin: 0 0 0.4rem;
+  color: #111827;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.select-tour-card__intro p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.select-tour-search {
+  margin-bottom: 1rem;
+}
+
+.select-tour-search-field {
+  width: 100%;
+}
+
+:host ::ng-deep .select-tour-search-field .p-iconfield {
+  width: 100%;
+}
+
+:host ::ng-deep .select-tour-search-field .p-inputtext {
+  width: 100%;
+  min-height: 2.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  color: #111827;
+  padding-block: 0.75rem;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .select-tour-search-field .p-inputtext:focus {
+  outline: 2px solid rgba(255, 138, 51, 0.18);
+  outline-offset: 0;
+  border-color: #ff8a33;
+  box-shadow: none;
+}
+
+.select-tour-empty-state {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  padding: 1.15rem;
+}
+
+.select-tour-empty-state strong {
+  color: #111827;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.select-tour-empty-state p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.select-tour-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.select-tour-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.select-tour-card-item {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.85rem;
+  background: #ffffff;
+  padding: 1.1rem;
+  min-height: 170px;
+  box-shadow: 0 1px 0 rgba(17, 24, 39, 0.04);
+}
+
+.select-tour-card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.select-tour-card-item h3 {
+  margin: 0 0 0.3rem;
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.select-tour-id {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.select-tour-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+:host ::ng-deep .select-tour-action.p-button {
+  min-width: 7rem;
+  border-radius: 0.6rem;
+  border: 1px solid #ff8a33;
+  background: #ff8a33;
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+}
+
+:host ::ng-deep .select-tour-action.p-button:hover {
+  border-color: #f27316;
+  background: #f27316;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .select-tour-content {
+    padding: 1.25rem;
+  }
+
+  .select-tour-shell {
+    padding-left: 0;
+  }
+
+  .select-tour-header {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+  .select-tour-grid {
+    grid-template-columns: 1fr;
+  }
+}

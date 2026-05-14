@@ -1,0 +1,120 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="create-tour-summary-content">
+    <div class="create-tour-summary-page">
+      <header class="create-tour-summary-header">
+        <div>
+          <h1>Create New Tour</h1>
+
+          <div
+            class="create-tour-summary-progress"
+            aria-label="Create tour progress"
+          >
+            <h2 class="create-tour-summary-progress__step">Details</h2>
+            <h2
+              class="create-tour-summary-progress__step create-tour-summary-progress__step--active"
+            >
+              Summary
+            </h2>
+            <h2 class="create-tour-summary-progress__step">Done</h2>
+          </div>
+        </div>
+      </header>
+
+      <section class="create-tour-summary-card">
+        <h3>Tour Summary</h3>
+
+        <form class="create-tour-summary-form">
+          <div class="create-tour-summary-form__row">
+            <label class="create-tour-summary-field">
+              <span>Tour Name</span>
+              <input type="text" [value]="draft.name" readonly />
+            </label>
+
+            <label class="create-tour-summary-field">
+              <span>Tour Type</span>
+              <input type="text" [value]="tourTypeLabel(draft.tourType)" readonly />
+            </label>
+          </div>
+
+          <div class="create-tour-summary-form__row">
+            <label class="create-tour-summary-field">
+              <span>From</span>
+              <input type="text" [value]="draft.from" readonly />
+            </label>
+
+            <label class="create-tour-summary-field">
+              <span>To</span>
+              <input type="text" [value]="draft.to" readonly />
+            </label>
+          </div>
+
+          <label class="create-tour-summary-field create-tour-summary-field--textarea">
+            <span>Description</span>
+            <textarea readonly>{{ draft.description }}</textarea>
+            <small>{{ descriptionLength }}/{{ maxDescriptionLength }}</small>
+          </label>
+        </form>
+
+        <footer class="create-tour-summary-footer">
+          <section class="create-tour-summary-stats">
+            <h3>Tour Route Details</h3>
+
+            <div class="create-tour-summary-stats__row">
+              <span>Tour Distance</span>
+              <strong>Placeholder</strong>
+            </div>
+
+            <div class="create-tour-summary-stats__row">
+              <span>Estimated Time</span>
+              <strong>Placeholder</strong>
+            </div>
+          </section>
+        </footer>
+
+        <section class="create-tour-summary-map">
+          <h3>Tour Map</h3>
+          <h4 class="create-tour-map__subtitle">Route preview on the map based on your starting point and end point</h4>
+
+          <div class="create-tour-summary-map__placeholder">
+            <div class="create-tour-summary-map__controls">
+              <button type="button">+</button>
+              <button type="button">-</button>
+            </div>
+
+            <div class="create-tour-summary-map__canvas">
+              <span>Leaflet route preview placeholder</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="create-tour-summary-actions">
+          <button
+            type="button"
+            class="create-tour-summary-actions__button create-tour-summary-actions__button--secondary"
+            (click)="editTour()"
+          >
+            Edit
+          </button>
+
+          <button
+            type="button"
+            class="create-tour-summary-actions__button create-tour-summary-actions__button--primary"
+            (click)="saveTour()"
+          >
+            {{ isSaving ? 'Saving...' : 'Save' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  </section>
+</app-shell>
+
+<app-confirm-dialog
+  [visible]="showLeaveDialog"
+  title="Cancel tour creation?"
+  message="Do you really want to cancel creating this tour? Your current progress will be lost."
+  confirmLabel="Leave page"
+  cancelLabel="Stay here"
+  (confirm)="confirmLeave()"
+  (cancel)="stayOnPage()"
+/>

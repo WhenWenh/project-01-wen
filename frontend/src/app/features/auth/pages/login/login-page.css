@@ -1,0 +1,325 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.login-shell {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  background: #ffffff;
+}
+
+.visual-side {
+  position: relative;
+  flex: 1 1 54%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('/form.jpg') right center / cover no-repeat;
+}
+
+.visual-side__brand {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  left: auto;
+  z-index: 1;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.visual-side__copy {
+  position: absolute;
+  top: 38%;
+  right: 3rem;
+  z-index: 1;
+  border-right: 6px solid rgba(255, 255, 255, 0.94);
+  padding-right: 1rem;
+  text-align: right;
+  font-size: clamp(2rem, 3vw, 3.6rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.visual-side__copy p {
+  margin: 0;
+}
+
+.form-panel {
+  width: min(46%, 720px);
+  min-width: 520px;
+  background-color: white;
+}
+
+.form-panel ::ng-deep .p-card {
+  min-height: 100dvh;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.form-panel ::ng-deep .p-card-body {
+  height: 100%;
+  padding: 1.75rem 3rem 2rem;
+}
+
+.form-panel ::ng-deep .p-card-content {
+  min-height: calc(100dvh - 3.75rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card__topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 7rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1f2937;
+}
+
+.login-card__hero {
+  text-align: center;
+  margin: 0 auto 3.5rem;
+  max-width: 26rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.login-card__eyebrow {
+  margin: 0 0 8px;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #000000;
+}
+
+.login-card__hero h1 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.login-card__subtitle {
+  margin: 8px 0 0;
+  color: #000000;
+  font-size: 0.95rem;
+}
+
+.login-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 28px;
+  width: min(100%, 28rem);
+  margin: 0 auto;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.field-error {
+  margin: -2px 0 0;
+  color: #dc2626;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+}
+
+.forgot-link {
+  color: #4b5563;
+  text-decoration: underline;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+}
+
+.login-button {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-panel ::ng-deep .login-button.p-button {
+  color: white;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  border: 0;
+  border-radius: 12px;
+  background: orange;
+  padding: 0.95rem 1.2rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-panel ::ng-deep .login-button.p-button:hover {
+  background: rgb(231, 150, 0);
+}
+
+.form-panel ::ng-deep .p-inputtext,
+.form-panel ::ng-deep .p-password-input {
+  width: 100%;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d5dbe5;
+  border-radius: 12px;
+  padding: 0.95rem 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-panel ::ng-deep .p-floatlabel,
+.form-panel ::ng-deep .p-password,
+.form-panel ::ng-deep .p-password .p-inputtext {
+  width: 100%;
+}
+
+.form-panel ::ng-deep .p-password {
+  display: block;
+}
+
+.form-panel ::ng-deep .p-inputtext::placeholder,
+.form-panel ::ng-deep .p-password-input::placeholder {
+  color: #eff5ff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-panel ::ng-deep .p-floatlabel label {
+  font-size: 14px;
+  background: #ffffff;
+  color: #6b7280;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 0 0.35rem;
+}
+
+.form-panel ::ng-deep .p-floatlabel:has(.p-inputtext:focus) label,
+.form-panel ::ng-deep .p-floatlabel:has(.p-password-input:focus) label,
+.form-panel ::ng-deep .p-floatlabel:has(.p-inputtext.p-filled) label,
+.form-panel ::ng-deep .p-floatlabel:has(.p-password-input.p-filled) label {
+  background: #ffffff;
+  color: #f59e0b;
+}
+
+.form-panel ::ng-deep .p-inputtext:enabled:focus,
+.form-panel ::ng-deep .p-password-input:enabled:focus {
+  border-color: #f59e0b;
+}
+
+.field-group--invalid ::ng-deep .p-inputtext,
+.field-group--invalid ::ng-deep .p-password .p-inputtext,
+.field-group--invalid ::ng-deep .p-password-input,
+.field-group--invalid ::ng-deep .p-password-input.p-inputtext,
+.field-group--invalid ::ng-deep p-password.ng-invalid .p-password-input,
+.field-group--invalid ::ng-deep p-password.ng-invalid.ng-dirty .p-password-input,
+.field-group--invalid ::ng-deep p-password .p-password-input {
+  border-color: #dc2626;
+  box-shadow: none;
+}
+
+.field-group--invalid ::ng-deep .p-floatlabel label,
+.field-group--invalid ::ng-deep .p-floatlabel:has(.p-inputtext.p-filled) label,
+.field-group--invalid ::ng-deep .p-floatlabel:has(.p-password-input.p-filled) label {
+  color: #dc2626;
+}
+
+.field-group--label-invalid ::ng-deep .p-floatlabel label,
+.field-group--label-invalid ::ng-deep .p-floatlabel:has(.p-inputtext.p-filled) label {
+  color: #dc2626;
+}
+
+.field-group--invalid ::ng-deep .p-inputtext:enabled:focus,
+.field-group--invalid ::ng-deep .p-password .p-inputtext:enabled:focus,
+.field-group--invalid ::ng-deep .p-password-input:enabled:focus,
+.field-group--invalid ::ng-deep .p-password-input.p-inputtext:enabled:focus,
+.field-group--invalid ::ng-deep p-password.ng-invalid .p-password-input:enabled:focus,
+.field-group--invalid ::ng-deep p-password.ng-invalid.ng-dirty .p-password-input:enabled:focus,
+.field-group--invalid ::ng-deep p-password .p-password-input:enabled:focus {
+  border-color: #dc2626;
+  box-shadow: none;
+}
+
+.form-panel ::ng-deep .p-divider {
+  margin: 28px 0 20px;
+}
+
+.form-panel ::ng-deep p-password.ng-invalid.ng-dirty .p-password-input,
+.form-panel ::ng-deep p-password.ng-valid.ng-dirty .p-password-input,
+.form-panel ::ng-deep p-password.ng-valid .p-password-input,
+.form-panel ::ng-deep p-password.ng-invalid .p-password-input {
+  border-color: #d5dbe5;
+  box-shadow: none;
+}
+
+.form-panel ::ng-deep p-password.ng-invalid.ng-dirty .p-password-input:enabled:focus,
+.form-panel ::ng-deep p-password.ng-valid.ng-dirty .p-password-input:enabled:focus,
+.form-panel ::ng-deep p-password.ng-valid .p-password-input:enabled:focus,
+.form-panel ::ng-deep p-password.ng-invalid .p-password-input:enabled:focus {
+  border-color: #f59e0b;
+  box-shadow: none;
+}
+
+.login-card__footer {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: auto 0 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.login-card__footer a {
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .login-shell {
+    flex-direction: column;
+  }
+
+  .visual-side {
+    min-height: 36dvh;
+  }
+
+  .visual-side__copy {
+    top: auto;
+    bottom: 2rem;
+    right: 1.5rem;
+    font-size: 2rem;
+  }
+
+  .visual-side__brand {
+    top: 1rem;
+    right: 1rem;
+    left: auto;
+    font-size: 1.25rem;
+  }
+
+  .form-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-panel ::ng-deep .p-card {
+    min-height: 64dvh;
+  }
+
+  .form-panel ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+
+  .login-card__topbar {
+    justify-content: center;
+    margin-bottom: 3rem;
+    gap: 16px;
+  }
+}

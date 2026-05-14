@@ -1,0 +1,17 @@
+<button
+  type="button"
+  class="favorite-toggle"
+  [class.favorite-toggle--active]="active"
+  [disabled]="loading"
+  [attr.aria-label]="active ? activeLabel : inactiveLabel"
+  (click)="toggle.emit()"
+>
+  <span
+    class="pi"
+    [class.pi-star-fill]="active && !loading"
+    [class.pi-star]="!active && !loading"
+    [class.pi-spinner]="loading"
+    [class.pi-spin]="loading"
+    aria-hidden="true"
+  ></span>
+</button>

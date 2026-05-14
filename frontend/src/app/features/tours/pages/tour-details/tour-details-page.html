@@ -1,0 +1,324 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="tour-details-content">
+    <div class="tour-details-shell">
+      <header class="tour-details-header">
+        <div>
+          <div class="tour-details-title-row">
+            <button
+              type="button"
+              class="tour-details-back-icon"
+              aria-label="Back to tours"
+              (click)="goBack()"
+            >
+              <span class="pi pi-arrow-left" aria-hidden="true"></span>
+            </button>
+            <h1>Tour Details</h1>
+          </div>
+          <p class="tour-details-description">Inspect the complete information of your selected tour.</p>
+          <app-page-breadcrumb [items]="breadcrumbItems()" />
+        </div>
+
+        @if (canShowTourActions()) {
+          <div class="tour-details-actions">
+            <app-favorite-toggle
+              [active]="isFavorite()"
+              [loading]="isTogglingFavorite()"
+              (toggle)="toggleFavorite()"
+            />
+            <p-button
+              label="Edit"
+              styleClass="tour-details-edit-button"
+              (onClick)="openEditTour()"
+            />
+            <p-button
+              label="Delete Tour"
+              styleClass="tour-details-delete-button"
+              [loading]="isDeletingTour()"
+              [disabled]="isDeletingTour()"
+              (onClick)="openDeleteDialog()"
+            />
+          </div>
+        }
+      </header>
+
+      @if (isLoadingTour()) {
+        <section class="tour-details-empty-state">
+          <h2>Loading tour...</h2>
+          <p>The selected tour is currently being fetched.</p>
+        </section>
+      } @else if (tourLoadError()) {
+        <section class="tour-details-empty-state">
+          <h2>Could not load tour</h2>
+          <p>{{ tourLoadError() }}</p>
+        </section>
+      } @else if (tour(); as selectedTour) {
+        <div class="tour-details-sections">
+          <div class="tour-details-map-shell">
+            <div class="tour-details-map" #mapContainer></div>
+          </div>
+          <div class="tour-details-top-row">
+            <section class="tour-details-card tour-details-card--statistics">
+              <div class="tour-details-card__intro">
+                <h2>Tour Route Details</h2>
+                <p>Distance and estimated time assigned to this tour.</p>
+              </div>
+
+              @if (isLoadingRoute()) {
+                <p class="tour-details-route-state">Loading route details...</p>
+              } @else if (routeLoadError()) {
+                <p class="tour-details-route-state">{{ routeLoadError() }}</p>
+              } @else if (routeDetails(); as route) {
+                <div class="tour-details-grid">
+                  <div class="tour-details-item">
+                    <span>Distance</span>
+                    <strong>{{ formatDistance(route.distance) }}</strong>
+                  </div>
+
+                  <div class="tour-details-item">
+                    <span>Est. Time</span>
+                    <strong>{{ formatDuration(route.duration) }}</strong>
+                  </div>
+                </div>
+              }
+            </section>
+
+            <section class="tour-details-card">
+              <div class="tour-details-card__intro">
+                <h2>Statistic Overview</h2>
+              </div>
+
+              <div class="tour-statistics-overview">
+                <div class="tour-statistics-item">
+                  <div class="tour-statistics-icon tour-statistics-icon--orange" aria-hidden="true">
+                    ☆
+                  </div>
+                  <div class="tour-statistics-copy">
+                    <span>Popularity:</span>
+                    <strong>4 Stars</strong>
+                  </div>
+                </div>
+
+                <div class="tour-statistics-divider" aria-hidden="true"></div>
+
+                <div class="tour-statistics-item">
+                  <div class="tour-statistics-icon tour-statistics-icon--green" aria-hidden="true">
+                    ☺
+                  </div>
+                  <div class="tour-statistics-copy">
+                    <span>Child-Friendly:</span>
+                    <strong>Medium</strong>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="tour-details-card">
+            <div class="tour-details-card__intro">
+              <h2>{{ selectedTour.name }}</h2>
+              <p>{{ selectedTour.description }}</p>
+            </div>
+
+            <div class="tour-details-grid">
+              <div class="tour-details-item">
+                <span>Tour ID</span>
+                <strong>{{ selectedTour.id }}</strong>
+              </div>
+
+              <div class="tour-details-item">
+                <span>Tour Type</span>
+                <strong>{{ tourTypeLabel(selectedTour.tourType) }}</strong>
+              </div>
+
+              <div class="tour-details-item">
+                <span>From</span>
+                <strong>{{ selectedTour.startName }}</strong>
+              </div>
+
+              <div class="tour-details-item">
+                <span>To</span>
+                <strong>{{ selectedTour.endName }}</strong>
+              </div>
+
+              <div class="tour-details-item tour-details-item--wide">
+                <span>Uploaded Image</span>
+                <div class="tour-details-image-row">
+                  <strong>
+                    {{
+                      selectedTour.imagePath
+                        ? uploadedImageName(selectedTour.imagePath)
+                        : 'No image uploaded'
+                    }}
+                  </strong>
+
+                  @if (selectedTour.imagePath) {
+                    <div class="tour-details-image-actions">
+                      <button
+                        type="button"
+                        class="tour-details-image-view"
+                        [disabled]="isLoadingImagePreview()"
+                        [attr.aria-label]="
+                          isLoadingImagePreview()
+                            ? 'Opening image preview'
+                            : 'View uploaded image'
+                        "
+                        (click)="openImagePreview()"
+                      >
+                        <span
+                          class="pi"
+                          [class.pi-eye]="!isLoadingImagePreview()"
+                          [class.pi-spin]="isLoadingImagePreview()"
+                          [class.pi-spinner]="isLoadingImagePreview()"
+                          aria-hidden="true"
+                        ></span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="tour-details-image-download"
+                        [disabled]="isDownloadingImage()"
+                        [attr.aria-label]="
+                          isDownloadingImage()
+                            ? 'Downloading uploaded image'
+                            : 'Download uploaded image'
+                        "
+                        (click)="downloadImage()"
+                      >
+                        <span
+                          class="pi"
+                          [class.pi-download]="!isDownloadingImage()"
+                          [class.pi-spin]="isDownloadingImage()"
+                          [class.pi-spinner]="isDownloadingImage()"
+                          aria-hidden="true"
+                        ></span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="tour-details-card">
+            <div class="tour-details-card__intro tour-details-card__intro--with-action">
+              <div>
+                <h2>Tour Logs</h2>
+                <p>All recorded log entries that belong to this tour.</p>
+              </div>
+
+              <p-button
+                label="+ New Tour Log"
+                styleClass="tour-details-new-log-button"
+                (onClick)="openCreateLog()"
+              />
+            </div>
+
+            @if (isLoadingLogs()) {
+              <div class="tour-details-log-placeholder">
+                <strong>Loading tour logs...</strong>
+                <p>The logs for this tour are currently being fetched.</p>
+              </div>
+            } @else if (logLoadError()) {
+              <div class="tour-details-log-placeholder">
+                <strong>Could not load tour logs.</strong>
+                <p>{{ logLoadError() }}</p>
+              </div>
+            } @else if (!tourLogs().length) {
+              <div class="tour-details-log-placeholder">
+                <strong>No logs for this tour yet.</strong>
+                <p>Create the first tour log to start tracking this specific route.</p>
+              </div>
+            } @else {
+              <div class="tour-details-log-list">
+                @for (log of tourLogs(); track log.id) {
+                  <article class="tour-details-log-card">
+                    <div class="tour-details-log-card__top">
+                      <div>
+                        <span class="tour-details-log-card__label">Log ID</span>
+                        <strong>{{ log.id }}</strong>
+                      </div>
+
+                      <div class="tour-details-log-actions">
+                        <button
+                          type="button"
+                          class="tour-details-log-action tour-details-log-action--view"
+                          aria-label="View tour log"
+                          (click)="openLogDetails(log.id)"
+                        >
+                          <span class="pi pi-eye" aria-hidden="true"></span>
+                        </button>
+
+                        <button
+                          type="button"
+                          class="tour-details-log-action tour-details-log-action--edit"
+                          aria-label="Edit tour log"
+                          (click)="openEditLog(log.id)"
+                        >
+                          <span class="pi pi-pencil" aria-hidden="true"></span>
+                        </button>
+
+                        <button
+                          type="button"
+                          class="tour-details-log-action tour-details-log-action--delete"
+                          aria-label="Delete tour log"
+                          (click)="openDeleteLogDialog(log)"
+                        >
+                          <span class="pi pi-trash" aria-hidden="true"></span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="tour-details-log-grid">
+                      <div class="tour-details-log-item">
+                        <span>Date</span>
+                        <strong>{{ formatLogDate(log.dateTime) }}</strong>
+                      </div>
+
+                      <div class="tour-details-log-item">
+                        <span>Rating</span>
+                        <strong>{{ log.rating }}/5</strong>
+                      </div>
+
+                      <div class="tour-details-log-item">
+                        <span>Difficulty</span>
+                        <strong>{{ log.difficulty }}/5</strong>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            }
+          </section>
+        </div>
+      }
+    </div>
+  </section>
+
+  <app-confirm-dialog
+    [visible]="showDeleteDialog()"
+    title="Delete tour"
+    message="Do you really want to delete this tour? This action cannot be undone."
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    (confirm)="confirmDeleteTour()"
+    (cancel)="closeDeleteDialog()"
+  />
+
+  <app-confirm-dialog
+    [visible]="showDeleteLogDialog()"
+    title="Delete tour log"
+    [message]="'Do you really want to delete log ' + (selectedLogForDelete()?.id || '') + '? This action cannot be undone.'"
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    (confirm)="confirmDeleteLog()"
+    (cancel)="closeDeleteLogDialog()"
+  />
+
+  <app-image-preview-dialog
+    [visible]="showImagePreviewDialog()"
+    [title]="tour()?.name ? tour()!.name + ' Image' : 'Tour Image'"
+    [imageUrl]="previewImageUrl()"
+    [imageAlt]="tour()?.name ? 'Uploaded image for ' + tour()!.name : 'Uploaded tour image'"
+    (close)="closeImagePreview()"
+  />
+</app-shell>

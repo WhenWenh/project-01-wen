@@ -1,0 +1,32 @@
+@if (visible) {
+  <div class="image-preview-dialog-backdrop" (click)="close.emit()">
+    <section
+      class="image-preview-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="image-preview-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="image-preview-dialog__header">
+        <h2 id="image-preview-dialog-title">{{ title }}</h2>
+
+        <button
+          type="button"
+          class="image-preview-dialog__close"
+          aria-label="Close image preview"
+          (click)="close.emit()"
+        >
+          <span class="pi pi-times" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="image-preview-dialog__body">
+        @if (imageUrl) {
+          <img [src]="imageUrl" [alt]="imageAlt" class="image-preview-dialog__image" />
+        } @else {
+          <p class="image-preview-dialog__empty">Image preview is not available.</p>
+        }
+      </div>
+    </section>
+  </div>
+}

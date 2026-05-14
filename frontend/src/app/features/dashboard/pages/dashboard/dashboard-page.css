@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  background: #ffffff;
+  color: #1f2937;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.dashboard-content {
+  padding: 2rem;
+}
+
+.dashboard-shell {
+  width: 100%;
+  max-width: 1200px;
+  padding-left: 2rem;
+  border-radius: 1rem;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+:host ::ng-deep .dashboard-new-tour-button.p-button {
+  border: 0;
+  border-radius: 0.6rem;
+  color: #ffffff;
+  background: #5b7ee5;
+  padding: 0.8rem 1.6rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+}
+
+:host ::ng-deep .dashboard-new-tour-button.p-button:hover {
+  background: #3c5ec3;
+  color: #ffffff;
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+p {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-content {
+    padding: 1.25rem;
+  }
+
+  .dashboard-shell {
+    padding-left: 0;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+  }
+}

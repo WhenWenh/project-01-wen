@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+.app-shell {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 260px minmax(0, 1fr);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.app-shell__sidebar {
+  min-width: 0;
+  height: 100%;
+}
+
+.app-shell__content {
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell__sidebar {
+    display: none;
+  }
+}

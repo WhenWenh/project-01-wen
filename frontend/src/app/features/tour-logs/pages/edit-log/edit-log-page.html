@@ -1,0 +1,222 @@
+<app-shell title="[Placeholder]" (logoutClick)="logout()">
+  <section class="create-log-content">
+    <div class="create-log-shell">
+      <header class="create-log-header">
+        <div>
+          <div class="create-log-title-row">
+            <button
+              type="button"
+              class="create-log-back-icon"
+              aria-label="Back to log details"
+              (click)="goBack()"
+            >
+              <span class="pi pi-arrow-left" aria-hidden="true"></span>
+            </button>
+
+            <h1>Edit Log</h1>
+          </div>
+          <h2>
+            Update the selected tour log entry
+            @if (loadedLog(); as selectedLog) {
+              for log {{ selectedLog.id }}.
+            } @else {
+              with the latest saved values.
+            }
+          </h2>
+          <app-page-breadcrumb [items]="breadcrumbItems()" />
+        </div>
+      </header>
+
+      <section class="create-log-card">
+        <div class="create-log-card__intro">
+          @if (isLoadingLog()) {
+            <h3>Loading tour log...</h3>
+            <p>The edit form is being prepared.</p>
+          } @else if (loadError()) {
+            <h3>Could not load tour log</h3>
+            <p>{{ loadError() }}</p>
+          } @else {
+            <h3>Edit Tour Log</h3>
+            <p>Adjust the existing values and save the updated tour log.</p>
+          }
+        </div>
+
+        @if (!isLoadingLog() && !loadError()) {
+          @if (saveError()) {
+            <div class="create-log-form-error">
+              {{ saveError() }}
+            </div>
+          }
+
+          <form [formGroup]="editLogForm" class="create-log-form">
+            <div class="create-log-form__row">
+              <label
+                class="create-log-field"
+                [class.create-log-field--invalid]="
+                  showRequiredError('dateTime') || showDateTimeFormatError()
+                "
+              >
+                <span>Date & Time</span>
+                <input
+                  type="datetime-local"
+                  [min]="minDateTime"
+                  [max]="maxDateTime"
+                  formControlName="dateTime"
+                  [class.create-log-field__control--invalid]="
+                    showRequiredError('dateTime') || showDateTimeFormatError()
+                  "
+                />
+                @if (showRequiredError('dateTime')) {
+                  <small class="create-log-field__error">Date and time are required.</small>
+                } @else if (showDateTimeFormatError()) {
+                  <small class="create-log-field__error">
+                    Please enter a valid date with a 4-digit year.
+                  </small>
+                }
+              </label>
+
+              <label
+                class="create-log-field"
+                [class.create-log-field--invalid]="showRequiredError('totalTime')"
+              >
+                <span>Total Time (minutes)</span>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 90"
+                  formControlName="totalTime"
+                  [class.create-log-field__control--invalid]="showRequiredError('totalTime')"
+                />
+                @if (showRequiredError('totalTime')) {
+                  <small class="create-log-field__error">Total time is required.</small>
+                }
+              </label>
+
+              <label
+                class="create-log-field"
+                [class.create-log-field--invalid]="
+                  showRequiredError('totalDistance') || showDistanceError()
+                "
+              >
+                <span>Total Distance (km)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="e.g. 12"
+                  formControlName="totalDistance"
+                  [class.create-log-field__control--invalid]="
+                    showRequiredError('totalDistance') || showDistanceError()
+                  "
+                />
+                @if (showRequiredError('totalDistance')) {
+                  <small class="create-log-field__error">Total distance is required.</small>
+                } @else if (showDistanceError()) {
+                  <small class="create-log-field__error">
+                    Total distance must be a whole number of kilometers.
+                  </small>
+                }
+              </label>
+            </div>
+
+            <div class="create-log-form__row">
+              <label
+                class="create-log-field"
+                [class.create-log-field--invalid]="showRequiredError('rating')"
+              >
+                <span>Rating</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  placeholder="1 - 5"
+                  formControlName="rating"
+                  [class.create-log-field__control--invalid]="showRequiredError('rating')"
+                />
+                @if (showRequiredError('rating')) {
+                  <small class="create-log-field__error">Rating is required.</small>
+                } @else if (showRangeError('rating')) {
+                  <small class="create-log-field__error">Rating must be between 1 and 5.</small>
+                }
+              </label>
+
+              <label
+                class="create-log-field"
+                [class.create-log-field--invalid]="showRequiredError('difficulty')"
+              >
+                <span>Difficulty</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  placeholder="1 - 5"
+                  formControlName="difficulty"
+                  [class.create-log-field__control--invalid]="showRequiredError('difficulty')"
+                />
+                @if (showRequiredError('difficulty')) {
+                  <small class="create-log-field__error">Difficulty is required.</small>
+                } @else if (showRangeError('difficulty')) {
+                  <small class="create-log-field__error">
+                    Difficulty must be between 1 and 5.
+                  </small>
+                }
+              </label>
+            </div>
+
+            <label
+              class="create-log-field create-log-field--textarea"
+              [class.create-log-field--invalid]="
+                showRequiredError('comment') || isCommentTooLong
+              "
+            >
+              <span>Comment</span>
+              <textarea
+                rows="6"
+                formControlName="comment"
+                placeholder="Write a short note about this tour log..."
+                [class.create-log-field__control--invalid]="
+                  showRequiredError('comment') || isCommentTooLong
+                "
+              ></textarea>
+              @if (showRequiredError('comment')) {
+                <small class="create-log-field__error">Comment is required.</small>
+              } @else if (isCommentTooLong) {
+                <small class="create-log-field__error">
+                  Comment can contain at most {{ maxCommentLength }} characters.
+                </small>
+              }
+              <small [class.create-log-field__counter--invalid]="isCommentTooLong">
+                {{ commentLength }}/{{ maxCommentLength }}
+              </small>
+            </label>
+
+            <div class="create-log-actions">
+              <p-button
+                label="Cancel"
+                styleClass="create-log-action create-log-action--secondary"
+                (onClick)="goBack()"
+              />
+              <p-button
+                label="Save Changes"
+                styleClass="create-log-action create-log-action--primary"
+                [loading]="isSaving"
+                [disabled]="isSaving"
+                (onClick)="saveLog()"
+              />
+            </div>
+          </form>
+        }
+      </section>
+    </div>
+  </section>
+</app-shell>
+
+<app-confirm-dialog
+  [visible]="showLeaveDialog"
+  title="Leave edit tour log?"
+  message="Do you really want to leave this page? Your current changes will be lost."
+  confirmLabel="Leave page"
+  cancelLabel="Stay here"
+  (confirm)="confirmLeave()"
+  (cancel)="stayOnPage()"
+/>

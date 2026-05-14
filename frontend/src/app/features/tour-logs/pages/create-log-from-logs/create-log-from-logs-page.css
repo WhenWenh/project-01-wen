@@ -1,0 +1,246 @@
+:host {
+  display: block;
+  background: #ffffff;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.create-log-content {
+  padding: 2rem;
+  background: #ffffff;
+}
+
+.create-log-shell {
+  width: 100%;
+  max-width: 1240px;
+  padding-left: 1rem;
+}
+
+.create-log-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.create-log-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.create-log-back-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.create-log-back-icon:hover {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #ea580c;
+}
+
+h1 {
+  margin: 0 0 0.7rem;
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+h2 {
+  margin: 0;
+  color: #374151;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.create-log-card {
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  padding: 1rem 1rem 1.25rem;
+}
+
+.create-log-card__intro {
+  margin-bottom: 1.4rem;
+}
+
+.create-log-card__intro h3 {
+  margin: 0 0 0.9rem;
+  color: #111827;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.create-log-card__intro p {
+  margin: 0.5rem 0 1rem;
+  padding-left: 0.3rem;
+  color: #6b7280;
+  font-size: 14.4px;
+}
+
+.create-log-form-error {
+  margin-bottom: 1rem;
+  border: 1px solid #fecaca;
+  border-radius: 0.6rem;
+  background: #fef2f2;
+  color: #991b1b;
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.create-log-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.create-log-form__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.create-log-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.create-log-field span {
+  color: #6b7280;
+  font-size: 0.86rem;
+}
+
+.create-log-field--invalid span {
+  color: #dc2626;
+}
+
+.create-log-field input,
+.create-log-field textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  color: #111827;
+  padding: 0.9rem 1rem;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.create-log-field input {
+  height: 3.5rem;
+}
+
+.create-log-field input:focus,
+.create-log-field textarea:focus {
+  outline: 2px solid rgba(91, 126, 229, 0.18);
+  outline-offset: 0;
+  border-color: #5b7ee5;
+}
+
+.create-log-field textarea {
+  min-height: 8.5rem;
+  resize: vertical;
+}
+
+.create-log-field__control--invalid {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.08);
+}
+
+.create-log-field--textarea small {
+  align-self: flex-end;
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.create-log-field__counter--invalid {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.create-log-field__error {
+  color: #dc2626;
+  font-size: 0.82rem;
+}
+
+.create-log-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+:host ::ng-deep .create-log-action.p-button {
+  min-width: 9.5rem;
+  border-radius: 0.4rem;
+  padding: 0.9rem 1.35rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 500;
+}
+
+:host ::ng-deep .create-log-action--secondary.p-button {
+  border: 1px solid #8b8b8b;
+  background: #8b8b8b;
+  color: #ffffff;
+}
+
+:host ::ng-deep .create-log-action--secondary.p-button:hover {
+  border-color: #767676;
+  background: #767676;
+  color: #ffffff;
+}
+
+:host ::ng-deep .create-log-action--primary.p-button {
+  border: 1px solid #ff8a33;
+  background: #ff8a33;
+  color: #ffffff;
+}
+
+:host ::ng-deep .create-log-action--primary.p-button:hover {
+  border-color: #f27316;
+  background: #f27316;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .create-log-content {
+    padding: 1.25rem;
+  }
+
+  .create-log-shell {
+    padding-left: 0;
+  }
+
+  .create-log-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-log-form__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .create-log-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .create-log-actions {
+    flex-direction: column;
+  }
+}
