@@ -15,7 +15,7 @@ public class TourPlannerApplication implements CommandLineRunner {
 
     private final Logger logger = LoggerService.getInstance().getLogger(getClass());
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         SpringApplication.run(TourPlannerApplication.class, args);
     }
 
