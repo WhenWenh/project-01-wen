@@ -97,6 +97,13 @@ stages:
               versionSpec: "20.x"
               checkLatest: true
 
+          - script: |
+              node --version
+              npm --version
+              npm install -g npm@10.8.2
+              npm --version
+            displayName: "Use npm 10.8.2"
+
           - task: Cache@2
             displayName: "Cache npm dependencies"
             inputs:
@@ -105,7 +112,7 @@ stages:
                 npm | "$(Agent.OS)"
               path: $(npm_config_cache)
 
-          - script: npm ci
+          - script: npm ci --cache $(npm_config_cache)
             displayName: "Install frontend dependencies"
             workingDirectory: frontend
 
