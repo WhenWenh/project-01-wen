@@ -9,7 +9,6 @@ variables:
   - name: npm_config_cache
     value: $(Pipeline.Workspace)/.npm
 
-
 stages:
   - stage: Build
     displayName: "Build backend"
@@ -76,15 +75,23 @@ stages:
               testRunTitle: "Backend JUnit Tests"
             condition: succeededOrFailed()
 
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish backend artifact"
+            inputs:
+              PathtoPublish: "backend/target"
+              ArtifactName: "backend-artifact"
+              publishLocation: "Container"
+
           - script: docker compose down -v
             displayName: "Stop PostgreSQL"
             workingDirectory: backend
+            condition: always()
             env:
               DB_USER: $(db-user)
               DB_PASSWORD: $(db-password)
               DB_NAME: $(db-name)
               DB_PORT: $(db-port)
-            condition: always()
+
       - job: frontend
         displayName: "Build frontend"
         timeoutInMinutes: 10
@@ -120,13 +127,30 @@ stages:
             displayName: "Build frontend"
             workingDirectory: frontend
 
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish frontend artifact"
+            inputs:
+              PathtoPublish: "frontend/dist"
+              ArtifactName: "frontend-artifact"
+              publishLocation: "Container"
+
   - stage: Release
     displayName: "Release"
     dependsOn: Build
     condition: succeeded()
     jobs:
-      - job: release_placeholder
-        displayName: "Release placeholder"
+      - job: release
+        displayName: "Release deployment"
         steps:
-          - script: echo "Release stage placeholder - deployment will be added later."
-            displayName: "Release placeholder"
+          - download: current
+            artifact: backend-artifact
+
+          - download: current
+            artifact: frontend-artifact
+
+          - task: AzureWebApp@1
+            displayName: "Deploy Backend to App Service"
+            inputs:
+              azureSubscription: "AzureConnection"
+              appName: "tourplanner-backend"
+              package: "$(Pipeline.Workspace)/backend-artifact/*.jar"
