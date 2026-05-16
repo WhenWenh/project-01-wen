@@ -154,4 +154,4 @@ stages:
               azureSubscription: "AzureConnection"
               appName: "tourplanner-backend"
               package: "$(Pipeline.Workspace)/backend-artifact/*.jar"
-              appSettings: "-JWT_SECRET $(jwt-secret-base64) -SPRING_AUTOCONFIGURE_EXCLUDE org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
+              appSettings: "-JWT_SECRET $(jwt-secret-base64) -SPRING_PROFILES_ACTIVE azure"
