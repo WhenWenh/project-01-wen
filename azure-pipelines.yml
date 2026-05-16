@@ -154,4 +154,16 @@ stages:
               azureSubscription: "AzureConnection"
               appName: "tourplanner-backend"
               package: "$(Pipeline.Workspace)/backend-artifact/*.jar"
-              appSettings: "-JWT_SECRET $(jwt-secret-base64) -SPRING_PROFILES_ACTIVE azure"
+
+          - task: AzureAppServiceSettings@1
+            displayName: "Set App Service settings"
+            inputs:
+              azureSubscription: "AzureConnection"
+              appName: "tourplanner-backend"
+              appSettings: |
+                [
+                  { "name": "JWT_SECRET", "value": "$(jwt-secret-base64)", "slotSetting": false },
+                  { "name": "SPRING_PROFILES_ACTIVE", "value": "azure", "slotSetting": false }
+                ]
+
+
