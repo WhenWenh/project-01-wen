@@ -154,6 +154,18 @@ stages:
               azureSubscription: "AzureConnection"
               appName: "tourplanner-backend"
               package: "$(Pipeline.Workspace)/backend-artifact/*.jar"
-              appSettings: |
-                -JWT_SECRET $(jwt-secret-base64)
-                -SPRING_AUTOCONFIGURE_EXCLUDE org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+          - task: AzureCLI@2
+            displayName: "Set App Service settings"
+            inputs:
+              azureSubscription: "AzureConnection"
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                RG=$(az webapp list --name tourplanner-backend --query '[0].resourceGroup' -o tsv)
+                az webapp config appsettings set \
+                  --name tourplanner-backend \
+                  --resource-group "$RG" \
+                  --settings \
+                    JWT_SECRET='$(jwt-secret-base64)' \
+                    SPRING_AUTOCONFIGURE_EXCLUDE='org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration'
