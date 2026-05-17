@@ -120,13 +120,27 @@ stages:
             displayName: "Build frontend"
             workingDirectory: frontend
 
+          - publish: frontend/dist/frontend/browser
+            artifact: frontend-build
+            displayName: "Publish frontend build artifact"
+
   - stage: Release
-    displayName: "Release"
+    displayName: "Release Frontend"
     dependsOn: Build
     condition: succeeded()
     jobs:
-      - job: release_placeholder
-        displayName: "Release placeholder"
+      - job: deploy_frontend
+        displayName: "Deploy to Azure App Service"
         steps:
-          - script: echo "Release stage placeholder - deployment will be added later."
-            displayName: "Release placeholder"
+          - download: current
+            artifact: frontend-build
+            displayName: "Download frontend build artifact"
+
+          - task: AzureWebApp@1
+            displayName: "Deploy to Azure App Service"
+            inputs:
+              azureSubscription: 'AzureResourceManager'
+              appType: 'webAppLinux'
+              appName: 'tourplanner-frontend'
+              package: '$(Pipeline.Workspace)/frontend-build'
+              startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
