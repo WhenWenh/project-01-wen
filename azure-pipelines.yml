@@ -5,7 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - group: KeyVaultVariables
+  - group: TourplannerKV
   - name: npm_config_cache
     value: $(Pipeline.Workspace)/.npm
 
@@ -68,6 +68,10 @@ stages:
               DB_NAME: $(db-name)
               DB_PORT: $(db-port)
               JWT_SECRET: $(jwt-secret-base64)
+
+          - publish: backend/target/tourplanner-*.jar
+            artifact: backend-build
+            displayName: "Publish backend JAR artifact"
 
           - task: PublishTestResults@2
             displayName: "Publish backend test results"
@@ -144,3 +148,18 @@ stages:
               appName: 'tourplanner-frontend'
               package: '$(Pipeline.Workspace)/frontend-build'
               startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
+
+      - job: deploy_backend
+        displayName: "Deploy to Azure App Service (Backend)"
+        steps:
+          - download: current
+            artifact: backend-build
+            displayName: "Download backend JAR artifact"
+
+          - task: AzureWebApp@1
+            displayName: "Deploy backend to Azure App Service"
+            inputs:
+              azureSubscription: 'AzureResourceManager'
+              appType: 'webAppLinux'
+              appName: 'tourplanner-backend'
+              package: '$(Pipeline.Workspace)/backend-build/tourplanner-*.jar'
