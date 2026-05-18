@@ -59,10 +59,7 @@ stages:
               DB_NAME: $(db-name)
               DB_PORT: $(db-port)
 
-          - script: |
-              echo "DB_USER is set: $([ -n "$DB_USER" ] && echo 'yes' || echo 'no')"
-              echo "JWT_SECRET is set: $([ -n "$JWT_SECRET" ] && echo 'yes' || echo 'no')"
-              ./mvnw -B -e clean package
+          - script: ./mvnw -B -e clean package
             displayName: "Build and test backend"
             workingDirectory: backend
             env:
