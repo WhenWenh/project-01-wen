@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'tourplanner-backend-b7drdyc8bcc9fzgu.italynorth-01.azurewebsites.net',
+  apiBaseUrl: 'https://tourplanner-backend-b7drdyc8bcc9fzgu.italynorth-01.azurewebsites.net/api',
   useMockAuth: false
 } as const;
