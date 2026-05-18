@@ -59,7 +59,9 @@ stages:
               DB_NAME: $(db-name)
               DB_PORT: $(db-port)
 
-          - script: ./mvnw -B -e clean package
+          - script: |
+              echo "JWT_SECRET length: ${#JWT_SECRET}"
+              ./mvnw -B -e clean package
             displayName: "Build and test backend"
             workingDirectory: backend
             env:
