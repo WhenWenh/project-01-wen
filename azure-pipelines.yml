@@ -5,86 +5,13 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - group: KeyVaultVariables
   - name: npm_config_cache
     value: $(Pipeline.Workspace)/.npm
 
-
 stages:
   - stage: Build
-    displayName: "Build backend"
+    displayName: "Build frontend"
     jobs:
-      - job: backend
-        displayName: "Build and test backend"
-        timeoutInMinutes: 10
-        steps:
-          - checkout: self
-
-          - task: JavaToolInstaller@0
-            displayName: "Use Java 21"
-            inputs:
-              versionSpec: "21"
-              jdkArchitectureOption: "x64"
-              jdkSourceOption: "PreInstalled"
-
-          - task: Cache@2
-            displayName: "Cache Maven dependencies"
-            inputs:
-              key: 'maven | "$(Agent.OS)" | backend/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-              path: ~/.m2/repository
-
-          - script: chmod +x ./mvnw
-            displayName: "Make Maven wrapper executable"
-            workingDirectory: backend
-
-          - script: |
-              docker compose up -d postgres
-
-              for i in {1..30}; do
-                if docker exec tour-postgres pg_isready -U "$DB_USER" -d "$DB_NAME"; then
-                  exit 0
-                fi
-                sleep 2
-              done
-
-              docker compose logs postgres
-              exit 1
-            displayName: "Start PostgreSQL for backend tests"
-            workingDirectory: backend
-            env:
-              DB_USER: $(db-user)
-              DB_PASSWORD: $(db-password)
-              DB_NAME: $(db-name)
-              DB_PORT: $(db-port)
-
-          - script: ./mvnw -B clean package
-            displayName: "Build and test backend"
-            workingDirectory: backend
-            env:
-              DB_USER: $(db-user)
-              DB_PASSWORD: $(db-password)
-              DB_NAME: $(db-name)
-              DB_PORT: $(db-port)
-              JWT_SECRET: $(jwt-secret-base64)
-
-          - task: PublishTestResults@2
-            displayName: "Publish backend test results"
-            inputs:
-              testResultsFiles: "backend/target/surefire-reports/TEST-*.xml"
-              testRunTitle: "Backend JUnit Tests"
-            condition: succeededOrFailed()
-
-          - script: docker compose down -v
-            displayName: "Stop PostgreSQL"
-            workingDirectory: backend
-            env:
-              DB_USER: $(db-user)
-              DB_PASSWORD: $(db-password)
-              DB_NAME: $(db-name)
-              DB_PORT: $(db-port)
-            condition: always()
       - job: frontend
         displayName: "Build frontend"
         timeoutInMinutes: 10
@@ -120,13 +47,27 @@ stages:
             displayName: "Build frontend"
             workingDirectory: frontend
 
+          - publish: frontend/dist/frontend/browser
+            artifact: frontend-build
+            displayName: "Publish frontend build artifact"
+
   - stage: Release
     displayName: "Release"
     dependsOn: Build
     condition: succeeded()
     jobs:
-      - job: release_placeholder
-        displayName: "Release placeholder"
+      - job: deploy_frontend
+        displayName: "Deploy to Azure App Service"
         steps:
-          - script: echo "Release stage placeholder - deployment will be added later."
-            displayName: "Release placeholder"
+          - download: current
+            artifact: frontend-build
+            displayName: "Download frontend build artifact"
+
+          - task: AzureWebApp@1
+            displayName: "Deploy to Azure App Service"
+            inputs:
+              azureSubscription: 'AzureResourceManager'
+              appType: 'webAppLinux'
+              appName: 'tourplanner-frontend'
+              package: '$(Pipeline.Workspace)/frontend-build'
+              startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
