@@ -86,7 +86,6 @@ stages:
               DB_PORT: $(db-port)
             condition: always()
 
-          # NEU: Das fertige JAR-Artefakt für das Release-Stage sichern
           - task: CopyFiles@2
             displayName: "Copy Backend JAR to Staging"
             inputs:
