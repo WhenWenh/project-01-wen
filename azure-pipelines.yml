@@ -1,18 +1,106 @@
 trigger:
   - main
-  - feat/release-pipeline
 
 pool:
   vmImage: ubuntu-latest
 
 variables:
+  - group: KeyVaultVariables
   - name: npm_config_cache
     value: $(Pipeline.Workspace)/.npm
 
 stages:
+  # ==========================================
+  # STAGE 1: BUILD (Frontend & Backend)
+  # ==========================================
   - stage: Build
-    displayName: "Build frontend"
+    displayName: "Build Application"
     jobs:
+      - job: backend
+        displayName: "Build and test backend"
+        timeoutInMinutes: 10
+        steps:
+          - checkout: self
+
+          - task: JavaToolInstaller@0
+            displayName: "Use Java 21"
+            inputs:
+              versionSpec: "21"
+              jdkArchitectureOption: "x64"
+              jdkSourceOption: "PreInstalled"
+
+          - task: Cache@2
+            displayName: "Cache Maven dependencies"
+            inputs:
+              key: 'maven | "$(Agent.OS)" | backend/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+              path: ~/.m2/repository
+
+          - script: chmod +x ./mvnw
+            displayName: "Make Maven wrapper executable"
+            workingDirectory: backend
+
+          - script: |
+              docker compose up -d postgres
+              for i in {1..30}; do
+                if docker exec tour-postgres pg_isready -U "$DB_USER" -d "$DB_NAME"; then
+                  exit 0
+                fi
+                sleep 2
+              done
+              docker compose logs postgres
+              exit 1
+            displayName: "Start PostgreSQL for backend tests"
+            workingDirectory: backend
+            env:
+              DB_USER: $(db-user)
+              DB_PASSWORD: $(db-password)
+              DB_NAME: $(db-name)
+              DB_PORT: $(db-port)
+
+          - script: ./mvnw -B clean package
+            displayName: "Build and test backend"
+            workingDirectory: backend
+            env:
+              DB_USER: $(db-user)
+              DB_PASSWORD: $(db-password)
+              DB_NAME: $(db-name)
+              DB_PORT: $(db-port)
+              JWT_SECRET: $(jwt-secret-base64)
+
+          - task: PublishTestResults@2
+            displayName: "Publish backend test results"
+            inputs:
+              testResultsFiles: "backend/target/surefire-reports/TEST-*.xml"
+              testRunTitle: "Backend JUnit Tests"
+            condition: succeededOrFailed()
+
+          - script: docker compose down -v
+            displayName: "Stop PostgreSQL"
+            workingDirectory: backend
+            env:
+              DB_USER: $(db-user)
+              DB_PASSWORD: $(db-password)
+              DB_NAME: $(db-name)
+              DB_PORT: $(db-port)
+            condition: always()
+
+          # NEU: Das fertige JAR-Artefakt für das Release-Stage sichern
+          - task: CopyFiles@2
+            displayName: "Copy Backend JAR to Staging"
+            inputs:
+              SourceFolder: 'backend/target'
+              Contents: '*.jar'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish backend artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'backend-build'
+              publishLocation: 'Container'
+
       - job: frontend
         displayName: "Build frontend"
         timeoutInMinutes: 10
@@ -25,11 +113,7 @@ stages:
               version: "20.x"
               checkLatest: true
 
-          - script: |
-              node --version
-              npm --version
-              npm install -g npm@10.8.2
-              npm --version
+          - script: npm install -g npm@10.8.2
             displayName: "Use npm 10.8.2"
 
           - task: Cache@2
@@ -44,6 +128,12 @@ stages:
             displayName: "Install frontend dependencies"
             workingDirectory: frontend
 
+          - script: |
+              mkdir -p src/environments
+              echo "export const environment = { production: true, apiBaseUrl: 'https://tourplanner-backend-b7drdyc8bcc9fzgu.germanywestcentral-01.azurewebsites.net/api', useMockAuth: false } as const;" > src/environments/environment.prod.ts
+            displayName: "Inject Azure Backend URL"
+            workingDirectory: frontend
+
           - script: npm run build
             displayName: "Build frontend"
             workingDirectory: frontend
@@ -52,23 +142,41 @@ stages:
             artifact: frontend-build
             displayName: "Publish frontend build artifact"
 
+  # ==========================================
+  # STAGE 2: RELEASE (Frontend & Backend)
+  # ==========================================
   - stage: Release
-    displayName: "Release Frontend"
+    displayName: "Deploy Application"
     dependsOn: Build
     condition: succeeded()
     jobs:
+      # Frontend Deployment
       - job: deploy_frontend
-        displayName: "Deploy to Azure App Service"
+        displayName: "Deploy Frontend to Azure"
         steps:
           - download: current
             artifact: frontend-build
-            displayName: "Download frontend build artifact"
 
           - task: AzureWebApp@1
-            displayName: "Deploy to Azure App Service"
+            displayName: "Azure Web App Deploy: Frontend"
             inputs:
               azureSubscription: 'AzureResourceManager'
               appType: 'webAppLinux'
               appName: 'tourplanner-frontend'
               package: '$(Pipeline.Workspace)/frontend-build'
               startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
+
+      # NEU: Backend Deployment
+      - job: deploy_backend
+        displayName: "Deploy Backend to Azure"
+        steps:
+          - download: current
+            artifact: backend-build
+
+          - task: AzureWebApp@1
+            displayName: "Azure Web App Deploy: Backend"
+            inputs:
+              azureSubscription: 'AzureResourceManager'
+              appType: 'webAppLinux'
+              appName: 'tourplanner-backend'
+              package: '$(Pipeline.Workspace)/backend-build/**/*.jar'
