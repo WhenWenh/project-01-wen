@@ -9,10 +9,13 @@ variables:
   - name: npm_config_cache
     value: $(Pipeline.Workspace)/.npm
 
-
 stages:
+  # ==========================================
+  # STAGE 1: BUILD (Frontend & Backend)
+  # ==========================================
+  # Test2
   - stage: Build
-    displayName: "Build backend"
+    displayName: "Build Application"
     jobs:
       - job: backend
         displayName: "Build and test backend"
@@ -41,14 +44,12 @@ stages:
 
           - script: |
               docker compose up -d postgres
-
               for i in {1..30}; do
                 if docker exec tour-postgres pg_isready -U "$DB_USER" -d "$DB_NAME"; then
                   exit 0
                 fi
                 sleep 2
               done
-
               docker compose logs postgres
               exit 1
             displayName: "Start PostgreSQL for backend tests"
@@ -85,6 +86,21 @@ stages:
               DB_NAME: $(db-name)
               DB_PORT: $(db-port)
             condition: always()
+
+          - task: CopyFiles@2
+            displayName: "Copy Backend JAR to Staging"
+            inputs:
+              SourceFolder: 'backend/target'
+              Contents: '*.jar'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish backend artifact"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'backend-build'
+              publishLocation: 'Container'
+
       - job: frontend
         displayName: "Build frontend"
         timeoutInMinutes: 10
@@ -97,11 +113,7 @@ stages:
               version: "20.x"
               checkLatest: true
 
-          - script: |
-              node --version
-              npm --version
-              npm install -g npm@10.8.2
-              npm --version
+          - script: npm install -g npm@10.8.2
             displayName: "Use npm 10.8.2"
 
           - task: Cache@2
@@ -120,13 +132,45 @@ stages:
             displayName: "Build frontend"
             workingDirectory: frontend
 
+          - publish: frontend/dist/frontend/browser
+            artifact: frontend-build
+            displayName: "Publish frontend build artifact"
+
+  # ==========================================
+  # STAGE 2: RELEASE (Frontend & Backend)
+  # ==========================================
   - stage: Release
-    displayName: "Release"
+    displayName: "Deploy Application"
     dependsOn: Build
     condition: succeeded()
     jobs:
-      - job: release_placeholder
-        displayName: "Release placeholder"
+      # Frontend Deployment
+      - job: deploy_frontend
+        displayName: "Deploy Frontend to Azure"
         steps:
-          - script: echo "Release stage placeholder - deployment will be added later."
-            displayName: "Release placeholder"
+          - download: current
+            artifact: frontend-build
+
+          - task: AzureWebApp@1
+            displayName: "Azure Web App Deploy: Frontend"
+            inputs:
+              azureSubscription: 'AzureResourceManager'
+              appType: 'webAppLinux'
+              appName: 'tourplanner-frontend'
+              package: '$(Pipeline.Workspace)/frontend-build'
+              startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
+
+      # NEU: Backend Deployment
+      - job: deploy_backend
+        displayName: "Deploy Backend to Azure"
+        steps:
+          - download: current
+            artifact: backend-build
+
+          - task: AzureWebApp@1
+            displayName: "Azure Web App Deploy: Backend"
+            inputs:
+              azureSubscription: 'AzureResourceManager'
+              appType: 'webAppLinux'
+              appName: 'tourplanner-backend'
+              package: '$(Pipeline.Workspace)/backend-build/**/*.jar'
