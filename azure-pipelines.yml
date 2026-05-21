@@ -128,12 +128,6 @@ stages:
             displayName: "Install frontend dependencies"
             workingDirectory: frontend
 
-          - script: |
-              mkdir -p src/environments
-              echo "export const environment = { production: true, apiBaseUrl: 'https://tourplanner-backend-b7drdyc8bcc9fzgu.germanywestcentral-01.azurewebsites.net/api', useMockAuth: false } as const;" > src/environments/environment.prod.ts
-            displayName: "Inject Azure Backend URL"
-            workingDirectory: frontend
-
           - script: npm run build
             displayName: "Build frontend"
             workingDirectory: frontend
